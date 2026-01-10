@@ -55,8 +55,8 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-3"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-dark-500 to-dark-700 flex items-center justify-center shadow-lg border border-white overflow-hidden">
-            <img src="/logo.png" alt="AlgoLabX Logo" className="w-full h-full object-cover" />
+          <div className="w-10 h-10 flex items-center justify-center">
+            <img src="/logo.png" alt="AlgoLabX Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <h2 className="text-lg font-bold text-dark-50">AlgoLabX</h2>
