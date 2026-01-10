@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://algo-lab-x.vercel.app/sitemap.xml
