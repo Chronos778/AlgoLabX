@@ -88,10 +88,13 @@ const Compare = () => {
     radix: { name: 'Radix Sort', complexity: 'O(d × (n + k))', type: 'sorting', getSteps: getRadixSortSteps, color: '#a855f7' },
     binary: { name: 'Binary Search', complexity: 'O(log n)', type: 'searching', getSteps: getBinarySearchSteps, color: '#3f3f48' },
     linear: { name: 'Linear Search', complexity: 'O(n)', type: 'searching', getSteps: getLinearSearchSteps, color: '#84cc16' },
+    jump: { name: 'Jump Search', complexity: 'O(√n)', type: 'searching', getSteps: getJumpSearchSteps, color: '#eab308' },
+    interpolation: { name: 'Interpolation Search', complexity: 'O(log log n)', type: 'searching', getSteps: getInterpolationSearchSteps, color: '#06b6d4' },
+    exponential: { name: 'Exponential Search', complexity: 'O(log n)', type: 'searching', getSteps: getExponentialSearchSteps, color: '#f43f5e' },
   };
 
   const getStepsWithTarget = (algo, array) => {
-    if (['binary', 'linear'].includes(algo)) {
+    if (['binary', 'linear', 'jump', 'interpolation', 'exponential'].includes(algo)) {
       const target = parseInt(searchTarget);
       if (!isNaN(target)) return [...array, target];
     }
@@ -173,6 +176,9 @@ const Compare = () => {
                 <optgroup label="Search Algorithms">
                   <option value="binary">Binary Search</option>
                   <option value="linear">Linear Search</option>
+                  <option value="jump">Jump Search</option>
+                  <option value="interpolation">Interpolation Search</option>
+                  <option value="exponential">Exponential Search</option>
                 </optgroup>
               </select>
             </div>
@@ -193,6 +199,9 @@ const Compare = () => {
                 <optgroup label="Search Algorithms">
                   <option value="binary">Binary Search</option>
                   <option value="linear">Linear Search</option>
+                  <option value="jump">Jump Search</option>
+                  <option value="interpolation">Interpolation Search</option>
+                  <option value="exponential">Exponential Search</option>
                 </optgroup>
               </select>
             </div>
@@ -227,6 +236,22 @@ const Compare = () => {
               </motion.button>
             </div>
           </div>
+
+          {/* Row 2.5: Search Target Input (Only visible if searching) */}
+          {(algorithms[algo1].type === 'searching' || algorithms[algo2].type === 'searching') && (
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-white mb-2">Search Target</label>
+              <div className="flex gap-3">
+                <input
+                  type="number"
+                  value={searchTarget}
+                  onChange={(e) => setSearchTarget(e.target.value)}
+                  className="w-full md:w-1/3 px-4 py-3 bg-dark-900 border border-white rounded-xl text-dark-100 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300"
+                  placeholder="Enter number to search..."
+                />
+              </div>
+            </div>
+          )}
 
           {/* Row 3: Speed Control & Playback */}
           <div className="flex flex-wrap items-center gap-4">
