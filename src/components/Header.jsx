@@ -191,7 +191,7 @@ const Header = ({ setActiveTab, setSelectedAlgorithm }) => {
           <div className="w-8 h-8 rounded-full border border-white/40 overflow-hidden bg-white/10">
             <img
               src="/assets/contributor_avatar.png"
-              alt="Contributor"
+              alt="Developer Profile"
               className="w-full h-full object-cover"
             />
           </div>
