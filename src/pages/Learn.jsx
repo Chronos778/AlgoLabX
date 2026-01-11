@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 import SmartVisualizer from '../components/SmartVisualizer';
 import MergeTree from '../components/MergeTree';
 import { useStepPlayer } from '../engine/stepPlayer';
-import { 
+import {
   // Sorting
-  getBubbleSortSteps, getQuickSortSteps, getSelectionSortSteps, getInsertionSortSteps, 
+  getBubbleSortSteps, getQuickSortSteps, getSelectionSortSteps, getInsertionSortSteps,
   getMergeSortSteps, getMergeSortTreeSteps, getHeapSortSteps, getCountingSortSteps, getRadixSortSteps,
   getShellSortSteps, getBucketSortSteps, getCocktailSortSteps, getCombSortSteps, getGnomeSortSteps, getOddEvenSortSteps,
   // Searching
@@ -223,15 +223,16 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-dark-800/40 backdrop-blur-xl border border-white rounded-xl sm:rounded-2xl p-3 sm:p-6 mb-4 sm:mb-6"
+          className="bg-dark-800/40 backdrop-blur-xl border border-white rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6"
         >
-          {/* Algorithm Selection */}
-          <div className="mb-3 sm:mb-4">
-            <label className="block text-xs sm:text-sm font-medium text-white mb-2">Algorithm</label>
-            <select
-              value={selectedAlgorithm}
-              onChange={(e) => setSelectedAlgorithm(e.target.value)}
-              className="w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-dark-900/60 border border-white rounded-lg text-xs sm:text-sm text-dark-100 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300"
+          <div className="flex flex-col lg:flex-row gap-6 lg:items-end">
+            {/* Algorithm Selection */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-xs sm:text-sm font-medium text-white mb-2">Algorithm</label>
+              <select
+                value={selectedAlgorithm}
+                onChange={(e) => setSelectedAlgorithm(e.target.value)}
+                className="w-full px-2.5 sm:px-3 py-2 sm:py-2.5 bg-dark-900/60 border border-white rounded-lg text-xs sm:text-sm text-dark-100 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300"
               >
                 <optgroup label="Simple Sorts (O(n²))">
                   <option value="bubble">Bubble Sort</option>
@@ -288,54 +289,63 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
               </select>
             </div>
 
-          {/* Custom Array Input */}
-          <div className="mb-3 sm:mb-4">
-            <label className="block text-xs sm:text-sm font-medium text-white mb-2">Custom Array</label>
-            <input
-              type="text"
-              value={customInput}
-              onChange={(e) => setCustomInput(e.target.value)}
-              className="w-full px-2 sm:px-3 py-2 sm:py-2.5 bg-dark-900/60 border border-white rounded-lg text-xs sm:text-sm text-dark-100 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300 mb-2"
-              placeholder="e.g., 5, 3, 8"
-            />
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleCustomInput}
-              className="w-full px-2 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-dark-600 to-dark-700 text-dark-100 font-medium rounded-lg border border-white transition-all duration-300 text-xs sm:text-sm"
-            >
-              Set Array
-            </motion.button>
+            {/* Custom Array Input */}
+            <div className="flex-[2] min-w-[300px]">
+              <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3">
+                <div className="flex-1 w-full">
+                  <label className="block text-xs sm:text-sm font-medium text-white mb-2">Custom Array</label>
+                  <input
+                    type="text"
+                    value={customInput}
+                    onChange={(e) => setCustomInput(e.target.value)}
+                    className="w-full px-2 sm:px-3 py-2 sm:py-2.5 bg-dark-900/60 border border-white rounded-lg text-xs sm:text-sm text-dark-100 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300"
+                    placeholder="e.g., 5, 3, 8"
+                  />
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleCustomInput}
+                  className="px-4 sm:px-6 py-2 sm:py-2.5 bg-dark-700/50 hover:bg-dark-600/50 text-dark-100 font-medium rounded-lg border border-white transition-all duration-300 text-xs sm:text-sm whitespace-nowrap"
+                >
+                  Set
+                </motion.button>
+              </div>
+            </div>
+
+            {/* Generate Random Array Button */}
+            <div className="flex-1">
+              <label className="block text-xs sm:text-sm font-medium text-white mb-2">Random Array</label>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleGenerateArray}
+                className="w-full px-4 py-2 sm:py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-medium rounded-lg shadow-lg shadow-emerald-500/10 transition-all duration-300 flex items-center justify-center gap-2 text-xs sm:text-sm"
+              >
+                <ShuffleIcon />
+                <span>Generate Random</span>
+              </motion.button>
+            </div>
           </div>
 
-          {/* Search Target Input - Conditional */}
+          {/* Search Target Input - Conditional (Single line below on desktop if needed, or row) */}
           {['binary', 'linear', 'jump', 'interpolation', 'exponential', 'ternary', 'fibonacci', 'sentinel', 'twopointer'].includes(selectedAlgorithm) && (
-            <div className="mb-3 sm:mb-4">
-              <label className="block text-xs sm:text-sm font-medium text-white mb-2">Search Target</label>
-              <input
-                type="number"
-                value={searchTarget}
-                onChange={(e) => setSearchTarget(e.target.value)}
-                className="w-full px-2 sm:px-3 py-2 sm:py-2.5 bg-dark-900/60 border border-dark-600/50 rounded-lg text-xs sm:text-sm text-dark-100 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-dark-500/50 focus:border-dark-500/50 transition-all duration-300"
-                placeholder="Target value"
-              />
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div className="w-full sm:w-64">
+                  <label className="block text-xs sm:text-sm font-medium text-white mb-2">Search Target</label>
+                  <input
+                    type="number"
+                    value={searchTarget}
+                    onChange={(e) => setSearchTarget(e.target.value)}
+                    className="w-full px-2 sm:px-3 py-2 sm:py-2.5 bg-dark-900/60 border border-white/30 rounded-lg text-xs sm:text-sm text-dark-100 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300"
+                    placeholder="Target value"
+                  />
+                </div>
+                <p className="text-white text-xs mt-2 sm:mt-6 italic opacity-60">The target element you want to search for in the array above.</p>
+              </div>
             </div>
           )}
-
-          {/* Generate Random Array Button */}
-          <div className="mb-3 sm:mb-4">
-            <label className="block text-xs sm:text-sm font-medium text-white mb-2">Random Array</label>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleGenerateArray}
-              className="w-full px-2 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-medium rounded-lg shadow-lg shadow-emerald-500/10 transition-all duration-300 flex items-center justify-center gap-1 text-xs sm:text-sm"
-            >
-              <ShuffleIcon />
-              <span className="hidden sm:inline">Generate</span>
-              <span className="sm:hidden">Gen</span>
-            </motion.button>
-          </div>
         </motion.div>
 
         {/* Main Content Grid */}
