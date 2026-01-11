@@ -5,6 +5,7 @@ import GraphVisualizer from './GraphVisualizer';
 import DPVisualizer from './DPVisualizer';
 import GanttChartVisualizer from './GanttChartVisualizer';
 import ChartsVisualizer from './ChartsVisualizer';
+import MergeTree from './MergeTree';
 
 const SmartVisualizer = ({
   algorithmType,
@@ -17,6 +18,9 @@ const SmartVisualizer = ({
   const getVisualizer = () => {
     switch (algorithmType) {
       case 'sorting':
+        if (stepData?.rootId) {
+          return <MergeTree currentStep={stepData} />;
+        }
         return (
           <ArrayVisualizer
             array={props.array || []}

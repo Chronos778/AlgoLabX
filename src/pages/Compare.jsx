@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import SmartVisualizer from '../components/SmartVisualizer';
 import { useStepPlayer } from '../engine/stepPlayer';
 import {
-  getBubbleSortSteps, getSelectionSortSteps, getInsertionSortSteps, getMergeSortSteps,
+  getBubbleSortSteps, getSelectionSortSteps, getInsertionSortSteps, getMergeSortSteps, getMergeSortTreeSteps,
   getQuickSortSteps, getHeapSortSteps, getCountingSortSteps, getRadixSortSteps,
   getBinarySearchSteps, getLinearSearchSteps, getJumpSearchSteps, getInterpolationSearchSteps, getExponentialSearchSteps
 } from '../algorithms/comprehensiveAlgorithms';
@@ -81,7 +81,7 @@ const Compare = () => {
     bubble: { name: 'Bubble Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getBubbleSortSteps, color: '#6b7280' },
     selection: { name: 'Selection Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getSelectionSortSteps, color: '#f59e0b' },
     insertion: { name: 'Insertion Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getInsertionSortSteps, color: '#8b5cf6' },
-    merge: { name: 'Merge Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getMergeSortSteps, color: '#10b981' },
+    merge: { name: 'Merge Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getMergeSortTreeSteps, color: '#10b981' },
     quick: { name: 'Quick Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getQuickSortSteps, color: '#a1a1ab' },
     heap: { name: 'Heap Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getHeapSortSteps, color: '#ec4899' },
     counting: { name: 'Counting Sort', complexity: 'O(n + k)', type: 'sorting', getSteps: getCountingSortSteps, color: '#f97316' },
