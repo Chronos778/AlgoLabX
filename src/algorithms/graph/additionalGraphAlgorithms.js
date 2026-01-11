@@ -316,10 +316,13 @@ export function getKruskalMSTSteps() {
   for (const edge of sortedEdges) {
     const { from, to, weight } = edge;
 
+    const visited = Array(n).fill(false);
+    mstNodes.forEach(node => visited[node] = true);
+
     steps.push({
       nodes: [...nodes],
       edges: [...edges],
-      visited: Array.from(mstNodes).map(() => true),
+      visited: [...visited],
       current: from,
       active: [from, to],
       message: `Considering edge ${from}-${to} (weight: ${weight})`
