@@ -1,5 +1,5 @@
 ﻿// Additional Search Algorithms
-// Ternary Search, Fibonacci Search, Exponential Binary Search
+// Ternary Search, Fibonacci Search, Sentinel Linear Search, Two-Pointer Search, Sublist Search
 
 // Ternary Search - Divide array into 3 parts
 export function getTernarySearchSteps(inputArr) {
