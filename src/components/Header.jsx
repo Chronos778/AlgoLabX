@@ -145,7 +145,9 @@ const Header = ({ setActiveTab, setSelectedAlgorithm, sidebarOpen, setSidebarOpe
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0 ml-2">
                     {item.type === 'algo' ? (
-                      <span className="px-1.5 py-0.5 rounded-md bg-dark-800 text-[9px] sm:text-[10px] text-white border border-dark-700/30 whitespace-nowrap">Algo</span>
+                      <span className="px-1.5 py-0.5 rounded-md bg-dark-800 text-[9px] sm:text-[10px] text-white border border-dark-700/30 whitespace-nowrap">
+                        Algo<span className="hidden sm:inline">rithm</span>
+                      </span>
                     ) : (
                       <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-[9px] sm:text-[10px] text-emerald-400 border border-emerald-500/20 whitespace-nowrap">Page</span>
                     )}
