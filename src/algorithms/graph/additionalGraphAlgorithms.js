@@ -156,10 +156,15 @@ export function getFloydWarshallSteps() {
           const newDist = dist[i][k] + dist[k][j];
           
           if (newDist < dist[i][j]) {
+            const visitedNodes = Array(n).fill(false);
+            visitedNodes[i] = true;
+            visitedNodes[k] = true;
+            visitedNodes[j] = true;
+
             steps.push({
               nodes: [...nodes],
               edges: [...edges],
-              visited: [i, k, j].map(() => true),
+              visited: visitedNodes,
               current: k,
               active: [i, k, j],
               message: `Path ${i}→${k}→${j}: ${dist[i][k]} + ${dist[k][j]} = ${newDist} < ${dist[i][j] === Infinity ? '∞' : dist[i][j]}`
