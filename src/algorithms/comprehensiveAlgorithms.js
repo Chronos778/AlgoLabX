@@ -13,7 +13,10 @@ export {
   getRadixSortSteps
 } from './comprehensiveSorting.js';
 
+export { getQuickSort3DSteps } from './quickSort3D.js';
+
 export { getMergeSortTreeSteps } from './mergeSortTree.js';
+export { getQuickSortTreeSteps } from './quickSortTree.js';
 
 // Additional Sorting Algorithms
 export {

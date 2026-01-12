@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import SmartVisualizer from '../components/SmartVisualizer';
+import QuickSort2D from '../components/QuickSort2D';
 import MergeTree from '../components/MergeTree';
+import QuickSort3D from '../components/QuickSort3D';
 import { useStepPlayer } from '../engine/stepPlayer';
 import {
   // Sorting
   getBubbleSortSteps, getQuickSortSteps, getSelectionSortSteps, getInsertionSortSteps,
   getMergeSortSteps, getMergeSortTreeSteps, getHeapSortSteps, getCountingSortSteps, getRadixSortSteps,
+  getQuickSortTreeSteps, getQuickSort3DSteps,
   getShellSortSteps, getBucketSortSteps, getCocktailSortSteps, getCombSortSteps, getGnomeSortSteps, getOddEvenSortSteps,
   // Searching
   getBinarySearchSteps, getLinearSearchSteps, getJumpSearchSteps, getInterpolationSearchSteps, getExponentialSearchSteps,
@@ -114,7 +117,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
     oddeven: { name: 'Odd-Even Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getOddEvenSortSteps, description: 'Parallel sorting algorithm that compares odd-even indexed pairs, then even-odd pairs alternately.' },
     // Efficient Sorts
     merge: { name: 'Merge Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getMergeSortTreeSteps, description: 'Efficient divide-and-conquer sorting algorithm that divides array into halves, sorts them, and merges them back together.' },
-    quick: { name: 'Quick Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getQuickSortSteps, description: 'Efficient sorting algorithm using divide-and-conquer strategy. Picks a pivot element and partitions array around it.' },
+    quick: { name: 'Quick Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getQuickSort3DSteps, description: 'High-quality 3D visualized divide-and-conquer sorting algorithm. Picks a pivot element and partitions array around it.' },
     heap: { name: 'Heap Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getHeapSortSteps, description: 'Efficient sorting algorithm that uses a binary heap data structure to sort elements in place.' },
     shell: { name: 'Shell Sort', complexity: 'O(n log² n)', type: 'sorting', getSteps: getShellSortSteps, description: 'Generalization of insertion sort that allows exchange of far apart elements using gap sequences.' },
     // Non-Comparison Sorts
@@ -225,7 +228,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
           transition={{ delay: 0.1 }}
           className="bg-dark-800/40 backdrop-blur-xl border border-white rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6"
         >
-          <div className="flex flex-col lg:flex-row gap-6 lg:items-end">
+          <div className="flex flex-col md:flex-row gap-6 lg:items-end">
             {/* Algorithm Selection */}
             <div className="flex-1 min-w-[200px]">
               <label className="block text-xs sm:text-sm font-medium text-white mb-2">Algorithm</label>
@@ -383,6 +386,17 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
                       <p className="text-white">Start playback to see visualization</p>
                     </div>
                   )
+                ) : selectedAlgorithm === 'quick' ? (
+                  currentStepData ? (
+                    <QuickSort3D
+                      currentStep={currentStepData}
+                      isDone={currentStepData.phase === 'done'}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center p-12 bg-dark-900/40 rounded-xl border border-dark-700/30">
+                      <p className="text-white">Start playback to see visualization</p>
+                    </div>
+                  )
                 ) : (
                   <>
                     {currentStepData ? (
@@ -520,7 +534,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className="space-y-3 sm:space-y-5"
+            className="space-y-3 sm:space-y-5 md:space-y-0 md:grid md:grid-cols-2 lg:flex lg:flex-col gap-4 lg:gap-5"
           >
             {/* Algorithm Info Card */}
             <div className="bg-dark-800/40 backdrop-blur-xl border border-white-700/40 rounded-2xl p-5">
