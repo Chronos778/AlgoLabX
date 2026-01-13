@@ -574,3 +574,13 @@ body {
   border-radius: 12px;
   font-size: 1.25rem;
 }
+
+/* Scrollbar Hide Utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

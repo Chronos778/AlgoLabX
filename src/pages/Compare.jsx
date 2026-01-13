@@ -340,13 +340,24 @@ const Compare = () => {
                 ) : algo1 === 'quick' ? (
                   <QuickSortVisualizer currentStep={data1} isCompact={true} />
                 ) : (
-                  <SmartVisualizer algorithmType={algorithms[algo1].type} stepData={data1} array={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? data1.array : undefined} activeIndices={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? data1.active : undefined} swappedIndices={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? (data1.swapped ? data1.active : []) : undefined} maxValue={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? (Math.max(...inputArray) + 10) : undefined} />
+                  <div className="w-full bg-[#050505] rounded-[2rem] border border-white overflow-hidden shadow-2xl p-4 sm:p-6 relative flex flex-col items-center justify-center min-h-[250px]">
+                    <SmartVisualizer
+                      algorithmType={algorithms[algo1].type}
+                      stepData={data1}
+                      array={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? data1.array : undefined}
+                      activeIndices={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? data1.active : undefined}
+                      swappedIndices={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? (data1.swapped ? data1.active : []) : undefined}
+                      maxValue={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? (Math.max(...inputArray) + 10) : undefined}
+                      useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven'].includes(algo1)}
+                    />
+
+                    {data1 && (data1.message || data1.description) && (
+                      <div className="mt-4 p-3 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 w-full">
+                        <p className="text-white text-xs text-center italic opacity-80">{data1.message || data1.description}</p>
+                      </div>
+                    )}
+                  </div>
                 )
-              )}
-              {data1 && (data1.message || data1.description) && (
-                <div className="mt-4 p-3 bg-dark-900/50 rounded-xl border border-dark-700/30">
-                  <p className="text-white text-sm">{data1.message || data1.description}</p>
-                </div>
               )}
             </div>
           </div>
@@ -369,13 +380,24 @@ const Compare = () => {
                 ) : algo2 === 'quick' ? (
                   <QuickSortVisualizer currentStep={data2} isCompact={true} />
                 ) : (
-                  <SmartVisualizer algorithmType={algorithms[algo2].type} stepData={data2} array={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? data2.array : undefined} activeIndices={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? data2.active : undefined} swappedIndices={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? (data2.swapped ? data2.active : []) : undefined} maxValue={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? (Math.max(...inputArray) + 10) : undefined} />
+                  <div className="w-full bg-[#050505] rounded-[2rem] border border-white overflow-hidden shadow-2xl p-4 sm:p-6 relative flex flex-col items-center justify-center min-h-[250px]">
+                    <SmartVisualizer
+                      algorithmType={algorithms[algo2].type}
+                      stepData={data2}
+                      array={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? data2.array : undefined}
+                      activeIndices={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? data2.active : undefined}
+                      swappedIndices={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? (data2.swapped ? data2.active : []) : undefined}
+                      maxValue={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? (Math.max(...inputArray) + 10) : undefined}
+                      useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven'].includes(algo2)}
+                    />
+
+                    {data2 && (data2.message || data2.description) && (
+                      <div className="mt-4 p-3 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 w-full">
+                        <p className="text-white text-xs text-center italic opacity-80">{data2.message || data2.description}</p>
+                      </div>
+                    )}
+                  </div>
                 )
-              )}
-              {data2 && (data2.message || data2.description) && (
-                <div className="mt-4 p-3 bg-dark-900/50 rounded-xl border border-dark-700/30">
-                  <p className="text-white text-sm">{data2.message || data2.description}</p>
-                </div>
               )}
             </div>
           </div>

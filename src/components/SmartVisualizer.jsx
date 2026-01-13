@@ -1,5 +1,6 @@
 import React from 'react';
 import ArrayVisualizer from './ArrayVisualizer';
+import ArrayBlockVisualizer from './ArrayBlockVisualizer';
 import SearchVisualizer from './SearchVisualizer';
 import GraphVisualizer from './GraphVisualizer';
 import DPVisualizer from './DPVisualizer';
@@ -21,6 +22,37 @@ const SmartVisualizer = ({
         if (stepData?.rootId) {
           return <MergeTree currentStep={stepData} />;
         }
+
+        // Use Block Visualizer for simple sorts or if sorted data is present
+        // This implicitly enables it for Bubble, Selection, Insertion if we pass sortedIndices
+        // We can also force it if we know the algorithm name, but SmartVisualizer currently only gets type.
+        // However, checking for 'sorted' prop in stepData is a good heuristic, or we can just default to it 
+        // if we want to replace the bar chart permanently for these.
+        // The prompt asked to "update in learn and compare", implying a pervasive change.
+        // Let's rely on the presence of specific props or just use it as the default for arrays 
+        // if it looks like a comparison sort step context.
+
+        // For now, let's use ArrayBlockVisualizer if 'sorted' property exists in stepData 
+        // (which we will add to the algorithms) OR if it's explicitly one of the target algos.
+        // Since we don't have algo name here easily without props drilling or deduction, 
+        // let's rely on the new data shape we are about to create.
+
+        if (props.useBlockVisualizer || stepData?.sorted || (stepData?.description && (stepData.description.includes('Bubble') || stepData.description.includes('Selection') || stepData.description.includes('Insertion')))) {
+          return (
+            <ArrayBlockVisualizer
+              array={props.array || []}
+              activeIndices={props.activeIndices || []}
+              swappedIndices={props.swappedIndices || []}
+              sortedIndices={stepData?.sorted || []}
+              specialIndices={{
+                min: stepData?.minIdx,
+                key: stepData?.keyIdx,
+                check: stepData?.checkIdx
+              }}
+            />
+          );
+        }
+
         return (
           <ArrayVisualizer
             array={props.array || []}

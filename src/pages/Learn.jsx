@@ -110,9 +110,9 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
 
   const algorithms = {
     // Simple Sorts
-    bubble: { name: 'Bubble Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getBubbleSortSteps, description: 'Simple sorting algorithm that repeatedly steps through list, compares adjacent elements and swaps them if they are in wrong order.' },
-    selection: { name: 'Selection Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getSelectionSortSteps, description: 'Simple sorting algorithm that divides input into sorted and unsorted regions, repeatedly selecting smallest element.' },
-    insertion: { name: 'Insertion Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getInsertionSortSteps, description: 'Simple sorting algorithm that builds final sorted array one item at a time by inserting each element into its proper position.' },
+    bubble: { name: 'Bubble Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getBubbleSortSteps, description: 'Visualized using Memory Blocks. Repeatedly steps through list, compares adjacent memory cells and slides them to swap if they are in wrong order.' },
+    selection: { name: 'Selection Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getSelectionSortSteps, description: 'Visualized using Memory Blocks. Divides memory into sorted and unsorted regions, repeatedly scanning for the smallest element to lock into place.' },
+    insertion: { name: 'Insertion Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getInsertionSortSteps, description: 'Visualized using Memory Blocks. Builds the final sorted sequence one item at a time by sliding each element into its proper position.' },
     cocktail: { name: 'Cocktail Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getCocktailSortSteps, description: 'Bidirectional bubble sort that traverses the list in both directions alternately.' },
     gnome: { name: 'Gnome Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getGnomeSortSteps, description: 'Simple sorting algorithm similar to insertion sort, but moving elements to proper position by swaps.' },
     comb: { name: 'Comb Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getCombSortSteps, description: 'Improvement over bubble sort using gap sequence to eliminate small values near the end.' },
@@ -410,7 +410,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
                     </div>
                   )
                 ) : (
-                  <>
+                  <div className="w-full bg-[#050505] rounded-[2.5rem] border border-white overflow-hidden shadow-2xl p-6 sm:p-8 relative flex flex-col items-center justify-center min-h-[350px]">
                     {currentStepData ? (
                       <SmartVisualizer
                         algorithmType={currentAlgo.type}
@@ -419,6 +419,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
                         activeIndices={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? currentStepData.active : undefined}
                         swappedIndices={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? (currentStepData.swapped ? currentStepData.active : []) : undefined}
                         maxValue={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? (Math.max(...inputArray) + 10) : undefined}
+                        useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven'].includes(selectedAlgorithm)}
                       />
                     ) : (
                       <div className="flex items-center justify-center p-12 bg-dark-900/40 rounded-xl border border-dark-700/30">
@@ -426,18 +427,18 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
                       </div>
                     )}
 
-                    {/* Step Description */}
+                    {/* Integrated Step Description */}
                     {currentStepData && (currentStepData.description || currentStepData.message) && (
                       <motion.div
                         key={currentStep}
                         initial={{ opacity: 0, y: 5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mt-4 p-3 sm:p-4 bg-dark-900/50 rounded-xl border border-white"
+                        className="mt-6 p-4 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 w-full max-w-2xl"
                       >
-                        <p className="text-white text-xs sm:text-sm break-words">{currentStepData.description || currentStepData.message}</p>
+                        <p className="text-white text-xs sm:text-sm text-center italic opacity-80">{currentStepData.description || currentStepData.message}</p>
                       </motion.div>
                     )}
-                  </>
+                  </div>
                 )}
               </div>
 
