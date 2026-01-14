@@ -10,7 +10,7 @@ export function* knapsackSteps(arr) {
   const half = Math.floor(arr.length / 2);
   const weights = arr.slice(0, half);
   const values = arr.slice(half);
-  const capacity = 50; // Fixed capacity
+  const capacity = Math.min(15, Math.max(...weights) * 2); // Dynamic capacity based on weights
   const n = weights.length;
   
   // DP table
@@ -19,8 +19,13 @@ export function* knapsackSteps(arr) {
   yield { 
     array: [dp[0][capacity]], 
     active: [], 
-    swapped: false, 
-    description: `Starting 0/1 Knapsack with capacity ${capacity}` 
+    swapped: false,
+    dpTable: JSON.parse(JSON.stringify(dp)),
+    currentItem: 0,
+    currentCapacity: 0,
+    itemWeights: weights,
+    itemValues: values,
+    message: `Starting 0/1 Knapsack with capacity ${capacity}. Items: ${n}`
   };
   
   for (let i = 1; i <= n; i++) {
@@ -37,24 +42,39 @@ export function* knapsackSteps(arr) {
       yield { 
         array: [dp[i][capacity]], 
         active: [i, w], 
-        swapped: true, 
-        description: `Item ${i}: weight=${weights[i - 1]}, value=${values[i - 1]}, capacity=${w}, best=${dp[i][w]}` 
+        swapped: true,
+        dpTable: JSON.parse(JSON.stringify(dp)),
+        currentItem: i,
+        currentCapacity: w,
+        itemWeights: weights,
+        itemValues: values,
+        message: `Item ${i}: w=${weights[i - 1]}, v=${values[i - 1]} | Capacity ${w} → Best: ${dp[i][w]}`
       };
     }
     
     yield { 
       array: [dp[i][capacity]], 
       active: [], 
-      swapped: false, 
-      description: `Completed item ${i}, current best value: ${dp[i][capacity]}` 
+      swapped: false,
+      dpTable: JSON.parse(JSON.stringify(dp)),
+      currentItem: i,
+      currentCapacity: capacity,
+      itemWeights: weights,
+      itemValues: values,
+      message: `✅ Item ${i} done. Best value at capacity ${capacity}: ${dp[i][capacity]}`
     };
   }
   
   yield { 
     array: [dp[n][capacity]], 
     active: [], 
-    swapped: false, 
-    description: `Knapsack completed! Maximum value: ${dp[n][capacity]}` 
+    swapped: false,
+    dpTable: JSON.parse(JSON.stringify(dp)),
+    currentItem: n,
+    currentCapacity: capacity,
+    itemWeights: weights,
+    itemValues: values,
+    message: `🎉 Knapsack complete! Maximum value: ${dp[n][capacity]}`
   };
 }
 
