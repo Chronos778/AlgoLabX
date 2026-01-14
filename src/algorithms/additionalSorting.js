@@ -1,4 +1,4 @@
-﻿// Additional Sorting Algorithms
+// Additional Sorting Algorithms
 // Shell Sort, Bucket Sort, Cocktail Shaker Sort, Comb Sort, Gnome Sort, Odd-Even Sort
 
 // Shell Sort - Improved insertion sort with gap sequence
