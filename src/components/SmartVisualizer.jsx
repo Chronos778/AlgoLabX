@@ -1,15 +1,21 @@
 import React from 'react';
 import ArrayVisualizer from './ArrayVisualizer';
 import ArrayBlockVisualizer from './ArrayBlockVisualizer';
+import LinearSearchVisualizer from './LinearSearchVisualizer';
+import BinarySearchVisualizer from './BinarySearchVisualizer';
+import TwoPointerVisualizer from './TwoPointerVisualizer';
 import SearchVisualizer from './SearchVisualizer';
 import GraphVisualizer from './GraphVisualizer';
 import DPVisualizer from './DPVisualizer';
 import GanttChartVisualizer from './GanttChartVisualizer';
 import ChartsVisualizer from './ChartsVisualizer';
 import MergeTree from './MergeTree';
+import DijkstraVisualizer from './DijkstraVisualizer';
+import BFSVisualizer from './BFSVisualizer';
 
 const SmartVisualizer = ({
   algorithmType,
+  algorithmName,
   stepData,
   comparisonData = null,
   algorithmNames = [],
@@ -65,6 +71,15 @@ const SmartVisualizer = ({
         );
 
       case 'searching':
+        if (algorithmName === 'linear') {
+          return <LinearSearchVisualizer stepData={stepData} />;
+        }
+        if (algorithmName === 'binary') {
+          return <BinarySearchVisualizer stepData={stepData} />;
+        }
+        if (algorithmName === 'twopointer') {
+          return <TwoPointerVisualizer stepData={stepData} />;
+        }
         return (
           <SearchVisualizer
             array={stepData?.array || []}
@@ -76,6 +91,12 @@ const SmartVisualizer = ({
         );
 
       case 'graph':
+        if (algorithmName === 'dijkstra') {
+          return <DijkstraVisualizer stepData={stepData} />;
+        }
+        if (algorithmName === 'bfs') {
+          return <BFSVisualizer stepData={stepData} />;
+        }
         // Add error handling for graph algorithms
         if (!stepData || !stepData.nodes || stepData.nodes.length === 0) {
           return (

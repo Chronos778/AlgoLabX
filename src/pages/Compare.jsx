@@ -7,7 +7,8 @@ import { useStepPlayer } from '../engine/stepPlayer';
 import {
   getBubbleSortSteps, getSelectionSortSteps, getInsertionSortSteps, getMergeSortSteps, getMergeSortTreeSteps,
   getCountingSortSteps, getRadixSortSteps,
-  getBinarySearchSteps, getLinearSearchSteps, getJumpSearchSteps, getInterpolationSearchSteps, getExponentialSearchSteps
+  getBinarySearchSteps, getLinearSearchSteps, getJumpSearchSteps, getInterpolationSearchSteps, getExponentialSearchSteps,
+  getTwoPointerSearchSteps
 } from '../algorithms/comprehensiveAlgorithms';
 import { getHeapSortDetailedSteps } from '../algorithms/heapSortDetailed';
 import { getQuickSort3DSteps as getQuickSortDetailedSteps } from '../algorithms/quickSort3D';
@@ -95,10 +96,11 @@ const Compare = () => {
     jump: { name: 'Jump Search', complexity: 'O(√n)', type: 'searching', getSteps: getJumpSearchSteps, color: '#eab308' },
     interpolation: { name: 'Interpolation Search', complexity: 'O(log log n)', type: 'searching', getSteps: getInterpolationSearchSteps, color: '#06b6d4' },
     exponential: { name: 'Exponential Search', complexity: 'O(log n)', type: 'searching', getSteps: getExponentialSearchSteps, color: '#f43f5e' },
+    twopointer: { name: 'Two Pointer Search', complexity: 'O(n)', type: 'searching', getSteps: getTwoPointerSearchSteps, color: '#10b981' },
   };
 
   const getStepsWithTarget = (algo, array) => {
-    if (['binary', 'linear', 'jump', 'interpolation', 'exponential'].includes(algo)) {
+    if (['binary', 'linear', 'jump', 'interpolation', 'exponential', 'twopointer'].includes(algo)) {
       const target = parseInt(searchTarget);
       if (!isNaN(target)) return [...array, target];
     }
@@ -180,6 +182,7 @@ const Compare = () => {
                 <optgroup label="Search Algorithms">
                   <option value="binary">Binary Search</option>
                   <option value="linear">Linear Search</option>
+                  <option value="twopointer">Two Pointer Search</option>
                   <option value="jump">Jump Search</option>
                   <option value="interpolation">Interpolation Search</option>
                   <option value="exponential">Exponential Search</option>
@@ -203,6 +206,7 @@ const Compare = () => {
                 <optgroup label="Search Algorithms">
                   <option value="binary">Binary Search</option>
                   <option value="linear">Linear Search</option>
+                  <option value="twopointer">Two Pointer Search</option>
                   <option value="jump">Jump Search</option>
                   <option value="interpolation">Interpolation Search</option>
                   <option value="exponential">Exponential Search</option>
@@ -343,6 +347,7 @@ const Compare = () => {
                   <div className="w-full bg-[#050505] rounded-[2rem] border border-white overflow-hidden shadow-2xl p-4 sm:p-6 relative flex flex-col items-center justify-center min-h-[250px]">
                     <SmartVisualizer
                       algorithmType={algorithms[algo1].type}
+                      algorithmName={algo1}
                       stepData={data1}
                       array={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? data1.array : undefined}
                       activeIndices={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? data1.active : undefined}
@@ -383,6 +388,7 @@ const Compare = () => {
                   <div className="w-full bg-[#050505] rounded-[2rem] border border-white overflow-hidden shadow-2xl p-4 sm:p-6 relative flex flex-col items-center justify-center min-h-[250px]">
                     <SmartVisualizer
                       algorithmType={algorithms[algo2].type}
+                      algorithmName={algo2}
                       stepData={data2}
                       array={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? data2.array : undefined}
                       activeIndices={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? data2.active : undefined}

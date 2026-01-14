@@ -1,161 +1,182 @@
 // Dijkstra's Algorithm Step Generator
 // Returns an array of steps with proper graph visualization data
 export function dijkstraSteps(input) {
-  const arr = [...input];
-  const steps = [];
-  const n = arr.length;
-  
-  // Create graph with nodes and edges
-  const nodes = arr.map((value, index) => ({
-    id: index,
-    value: value,
-    label: `Node ${index}`,
-    x: 0, // Will be calculated by visualizer
-    y: 0  // Will be calculated by visualizer
-  }));
-  
+  // input can be node values, but for Dijkstra we often use a fixed graph for visualization
+  // unless the user provides a specific adjacency matrix/list.
+  // For this visualizer, let's create a standard educational graph if input is simple.
+
+  const nodeCount = input && input.length > 3 ? input.length : 6;
+  const nodes = [];
   const edges = [];
-  for (let i = 0; i < n; i++) {
-    for (let j = i + 1; j < Math.min(i + 3, n); j++) {
-      edges.push({
-        from: i,
-        to: j,
-        weight: Math.abs(arr[j] - arr[i]),
-        label: `${Math.abs(arr[j] - arr[i])}`
-      });
+
+  // Create nodes in a nice circular/hexagonal layout for better visualization
+  for (let i = 0; i < nodeCount; i++) {
+    const angle = (i / nodeCount) * 2 * Math.PI;
+    const radius = 150;
+    nodes.push({
+      id: i,
+      label: String.fromCharCode(65 + i), // A, B, C...
+      x: 250 + radius * Math.cos(angle),
+      y: 200 + radius * Math.sin(angle)
+    });
+  }
+
+  // Create a somewhat dense but readable set of edges if none provided
+  // We'll use the input values to influence weights if possible
+  const getWeight = (i, j) => {
+    const val1 = input[i] || 10;
+    const val2 = input[j] || 10;
+    return Math.floor(Math.abs(val1 + val2) / 2) || 5;
+  };
+
+  // Connect in a way that makes sense for a demo graph
+  for (let i = 0; i < nodeCount; i++) {
+    // Connect to next node
+    edges.push({ from: i, to: (i + 1) % nodeCount, weight: getWeight(i, (i + 1) % nodeCount) });
+    // Connect to node after next (skip 1)
+    if (nodeCount > 4) {
+      edges.push({ from: i, to: (i + 2) % nodeCount, weight: getWeight(i, (i + 2) % nodeCount) + 2 });
+    }
+    // Add a cross edge
+    if (i === 0 && nodeCount > 5) {
+      edges.push({ from: 0, to: 3, weight: getWeight(0, 3) + 5 });
     }
   }
-  
-  const distances = new Array(n).fill(Infinity);
-  const visited = new Array(n).fill(false);
-  const previous = new Array(n).fill(-1);
-  
-  // Initial state
-  steps.push({
-    nodes: [...nodes],
-    edges: [...edges],
-    visited: [...visited],
-    current: -1,
-    active: [],
-    distances: [...distances],
-    shortestPath: [],
-    message: "Starting Dijkstra's Algorithm from node 0"
+
+  const steps = [];
+  const distances = {};
+  const visited = new Set();
+  const previous = {};
+  const unvisited = new Set();
+
+  nodes.forEach(node => {
+    distances[node.id] = Infinity;
+    previous[node.id] = null;
+    unvisited.add(node.id);
   });
-  
-  // Start from node 0
-  distances[0] = 0;
-  
+
+  const sourceId = 0;
+  distances[sourceId] = 0;
+
+  // Initial Step
   steps.push({
-    nodes: [...nodes],
-    edges: [...edges],
-    visited: [...visited],
-    current: 0,
-    active: [0],
-    distances: [...distances],
-    message: "Set distance to source node 0 as 0"
+    nodes,
+    edges,
+    distances: { ...distances },
+    visited: Array.from(visited),
+    current: null,
+    activeEdge: null,
+    message: "Initializing Dijkstra: Source node dist=0, others=∞",
+    shortestPath: []
   });
-  
-  for (let iteration = 0; iteration < n; iteration++) {
-    // Find unvisited node with minimum distance
-    let minDist = Infinity;
-    let current = -1;
-    
-    for (let i = 0; i < n; i++) {
-      if (!visited[i] && distances[i] < minDist) {
-        minDist = distances[i];
-        current = i;
+
+  while (unvisited.size > 0) {
+    // Select unvisited node with smallest distance
+    let currentId = null;
+    let minDistance = Infinity;
+
+    for (const nodeId of unvisited) {
+      if (distances[nodeId] < minDistance) {
+        minDistance = distances[nodeId];
+        currentId = nodeId;
       }
     }
-    
-    if (current === -1) break;
-    
-    visited[current] = true;
-    
+
+    if (currentId === null) break; // Remaining nodes are unreachable
+
+    unvisited.delete(currentId);
+
     steps.push({
-      nodes: [...nodes],
-      edges: [...edges],
-      visited: [...visited],
-      current: current,
-      active: [current],
-      distances: [...distances],
-      shortestPath: [],
-      message: `Selected node ${current} with minimum distance ${minDist}`
+      nodes,
+      edges,
+      distances: { ...distances },
+      visited: Array.from(visited),
+      current: currentId,
+      activeEdge: null,
+      message: `Selected Node ${String.fromCharCode(65 + currentId)} (dist: ${minDistance}) as current work node.`,
+      shortestPath: []
     });
-    
-    // Update distances to neighbors
-    const neighbors = edges.filter(e => e.from === current);
+
+    // Relax neighbors
+    const neighbors = edges.filter(e => e.from === currentId || e.to === currentId);
+
     for (const edge of neighbors) {
-      const neighbor = edge.to;
+      const neighborId = edge.from === currentId ? edge.to : edge.from;
+
+      if (!unvisited.has(neighborId)) continue;
+
       const weight = edge.weight;
-      
-      if (!visited[neighbor]) {
-        const newDist = distances[current] + weight;
-        
-        if (newDist < distances[neighbor]) {
-          steps.push({
-            nodes: [...nodes],
-            edges: [...edges],
-            visited: [...visited],
-            current: current,
-            active: [current, neighbor],
-            distances: [...distances],
-            message: `Found shorter path to node ${neighbor}: ${newDist} < ${distances[neighbor]}`
-          });
-          
-          distances[neighbor] = newDist;
-          previous[neighbor] = current;
-          
-          steps.push({
-            nodes: [...nodes],
-            edges: [...edges],
-            visited: [...visited],
-            current: current,
-            active: [current, neighbor],
-            distances: [...distances],
-            message: `Updated distance to node ${neighbor} to ${newDist}`
-          });
-        }
+      const alt = distances[currentId] + weight;
+
+      steps.push({
+        nodes,
+        edges,
+        distances: { ...distances },
+        visited: Array.from(visited),
+        current: currentId,
+        activeEdge: edge,
+        checking: neighborId,
+        message: `Checking edge to ${String.fromCharCode(65 + neighborId)}: ${distances[currentId]} + ${weight} = ${alt}`,
+        shortestPath: []
+      });
+
+      if (alt < distances[neighborId]) {
+        distances[neighborId] = alt;
+        previous[neighborId] = currentId;
+
+        steps.push({
+          nodes,
+          edges,
+          distances: { ...distances },
+          visited: Array.from(visited),
+          current: currentId,
+          activeEdge: edge,
+          updating: neighborId,
+          message: `Update! New shortest distance to ${String.fromCharCode(65 + neighborId)} is ${alt}`,
+          shortestPath: []
+        });
       }
     }
-    
+
+    visited.add(currentId);
+
     steps.push({
-      nodes: [...nodes],
-      edges: [...edges],
-      visited: [...visited],
-      current: current,
-      active: [],
-      distances: [...distances],
-      message: `Iteration ${iteration + 1} complete`
+      nodes,
+      edges,
+      distances: { ...distances },
+      visited: Array.from(visited),
+      current: currentId,
+      message: `Node ${String.fromCharCode(65 + currentId)} finalized.`,
+      shortestPath: []
     });
   }
-  
-  // Final state
-  const finalDistances = distances.map(d => d === Infinity ? '∞' : d);
-  
-  // Reconstruct shortest paths from node 0
-  const shortestPaths = [];
-  for (let i = 1; i < n; i++) {
-    if (distances[i] < Infinity) {
-      const path = [];
-      let current = i;
-      while (current !== -1) {
-        path.unshift(current);
-        current = previous[current];
-      }
-      shortestPaths.push(path);
+
+  // Final Step: Highlight path to the furthest reachable node for demo
+  let targetId = 0;
+  let maxD = 0;
+  Object.entries(distances).forEach(([id, d]) => {
+    if (d !== Infinity && d > maxD) {
+      maxD = d;
+      targetId = parseInt(id);
     }
-  }
-  
-  steps.push({
-    nodes: [...nodes],
-    edges: [...edges],
-    visited: [...visited],
-    current: -1,
-    active: [],
-    distances: [...distances],
-    shortestPath: shortestPaths[0] || [],
-    message: `Dijkstra's completed. Final distances: [${finalDistances.join(', ')}]`
   });
-  
+
+  const finalPathNodes = [];
+  let curr = targetId;
+  while (curr !== null) {
+    finalPathNodes.unshift(curr);
+    curr = previous[curr];
+  }
+
+  steps.push({
+    nodes,
+    edges,
+    distances: { ...distances },
+    visited: Array.from(visited),
+    current: null,
+    message: `Dijkstra complete. Highlighted shortest path to Node ${String.fromCharCode(65 + targetId)}.`,
+    shortestPath: finalPathNodes
+  });
+
   return steps;
 }

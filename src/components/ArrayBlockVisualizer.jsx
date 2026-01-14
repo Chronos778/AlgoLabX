@@ -96,15 +96,10 @@ const ArrayBlockVisualizer = ({
     }, [array]);
 
     return (
-        <div className={`w-full flex flex-col items-center gap-6 sm:gap-10 ${className}`}>
-            {/* Array Track Container Wrapper */}
-            <div className="w-full px-2 sm:px-6">
-                <div className={`
-                    relative w-full
-                    flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-8
-                    bg-white/[0.03] border border-white rounded-[2.5rem] shadow-inner
-                    flex-nowrap justify-center
-                `}>
+        <div className={`w-full flex flex-col items-center gap-6 ${className}`}>
+            {/* Array Track Container */}
+            <div className="w-full px-2 sm:px-4">
+                <div className="relative w-full flex items-end justify-center gap-1 sm:gap-2 py-4 flex-nowrap">
                     <AnimatePresence mode='popLayout'>
                         {arrayItems.map(({ value, index, key }) => {
                             const isSwapped = swappedIndices.includes(index);
@@ -112,12 +107,12 @@ const ArrayBlockVisualizer = ({
                             const isSorted = sortedIndices.includes(index);
                             const styles = getBlockStyles(index, isActive, isSwapped, isSorted, specialIndices);
 
-                            // Dynamic sizing based on array length
-                            const blockClass = array.length > 20
-                                ? 'h-7 sm:h-9 text-[10px]'
+                            // Responsive sizing logic to fit in one row
+                            const blockSize = array.length > 20
+                                ? 'h-6 sm:h-8 text-[8px]'
                                 : array.length > 15
-                                    ? 'h-8 sm:h-10 text-xs'
-                                    : 'h-10 sm:h-12 text-sm sm:text-base';
+                                    ? 'h-8 sm:h-10 text-[10px]'
+                                    : 'h-10 sm:h-14 text-sm sm:text-lg';
 
                             return (
                                 <motion.div
@@ -125,34 +120,30 @@ const ArrayBlockVisualizer = ({
                                     layout
                                     transition={{
                                         type: "spring",
-                                        stiffness: 300,
+                                        stiffness: 350,
                                         damping: 25
                                     }}
                                     animate={styles}
                                     initial={{ opacity: 0, scale: 0.8 }}
                                     className={`
                                         flex items-center justify-center 
-                                        rounded-lg sm:rounded-xl border
-                                        font-bold relative
-                                        flex-1 min-w-0 max-w-[48px]
+                                        rounded-lg sm:rounded-xl border-2
+                                        font-black relative
+                                        flex-1 min-w-0 max-w-[64px]
                                         aspect-square
-                                        ${blockClass}
+                                        ${blockSize}
                                     `}
                                     style={{
                                         zIndex: (isActive || isSwapped) ? 50 : (isSorted ? 1 : 10)
                                     }}
                                 >
-                                    <span className="truncate">{value}</span>
+                                    <span className="truncate px-0.5">{value}</span>
 
                                     {/* Active indicator glow */}
                                     {(isActive || isSwapped) && (
                                         <motion.div
-                                            layoutId="active-glow"
+                                            layoutId="box-glow"
                                             className="absolute inset-0 rounded-lg sm:rounded-xl bg-white/5 blur-md"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.2 }}
                                         />
                                     )}
                                 </motion.div>

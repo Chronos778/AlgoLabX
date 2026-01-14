@@ -353,20 +353,24 @@ export function getBinarySearchSteps(arr) {
     steps.push({
       array: [],
       active: [],
-      swapped: false,
+      pointers: { low: -1, mid: -1, high: -1 },
+      discarded: [],
       message: "Invalid input: need array and target"
     });
     return steps;
   }
 
   const target = arr[arr.length - 1];
+  // Binary Search requires sorted array. We sort it just in case, though the user should ideally provide one.
   const sortedArr = arr.slice(0, -1).sort((a, b) => a - b);
+  const discarded = [];
 
   steps.push({
     array: [...sortedArr],
-    active: [],
-    swapped: false,
-    message: `Starting Binary Search for target: ${target}`
+    pointers: { low: 0, mid: -1, high: sortedArr.length - 1 },
+    discarded: [],
+    targetValue: target,
+    message: `Starting Binary Search on sorted array for target: ${target}`
   });
 
   let left = 0;
@@ -377,44 +381,59 @@ export function getBinarySearchSteps(arr) {
 
     steps.push({
       array: [...sortedArr],
-      active: [mid],
-      swapped: false,
-      message: `Searching in range [${left}, ${right}], mid = ${mid} (value: ${sortedArr[mid]})`
+      pointers: { low: left, mid: mid, high: right },
+      discarded: [...discarded],
+      targetValue: target,
+      message: `Comparing mid index ${mid} (value: ${sortedArr[mid]}) with target ${target}`
     });
 
     if (sortedArr[mid] === target) {
       steps.push({
         array: [...sortedArr],
-        active: [mid],
-        swapped: true,
+        pointers: { low: left, mid: mid, high: right },
+        discarded: [...discarded],
         targetIndex: mid,
-        message: `Found target ${target} at index ${mid}!`
+        targetValue: target,
+        found: true,
+        message: `Match Found! ${target} is at index ${mid}.`
       });
       return steps;
     } else if (sortedArr[mid] < target) {
+      // Discard left half including mid
+      for (let i = left; i <= mid; i++) {
+        if (!discarded.includes(i)) discarded.push(i);
+      }
       left = mid + 1;
       steps.push({
         array: [...sortedArr],
-        active: [mid],
-        swapped: false,
-        message: `${sortedArr[mid]} < ${target}, search right half [${left}, ${right}]`
+        pointers: { low: left, mid: mid, high: right },
+        discarded: [...discarded],
+        targetValue: target,
+        message: `${sortedArr[mid]} < ${target}. Discarding left half. Search range is now [${left}, ${right}].`
       });
     } else {
+      // Discard right half including mid
+      for (let i = mid; i <= right; i++) {
+        if (!discarded.includes(i)) discarded.push(i);
+      }
       right = mid - 1;
       steps.push({
         array: [...sortedArr],
-        active: [mid],
-        swapped: false,
-        message: `${sortedArr[mid]} > ${target}, search left half [${left}, ${right}]`
+        pointers: { low: left, mid: mid, high: right },
+        discarded: [...discarded],
+        targetValue: target,
+        message: `${sortedArr[mid]} > ${target}. Discarding right half. Search range is now [${left}, ${right}].`
       });
     }
   }
 
   steps.push({
     array: [...sortedArr],
-    active: [],
-    swapped: false,
-    message: `Target ${target} not found in the array`
+    pointers: { low: left, mid: -1, high: right },
+    discarded: [...discarded],
+    targetValue: target,
+    found: false,
+    message: `Target ${target} not found in the array.`
   });
 
   return steps;
@@ -429,7 +448,8 @@ export function getLinearSearchSteps(arr) {
     steps.push({
       array: [],
       active: [],
-      swapped: false,
+      failed: [],
+      targetValue: null,
       message: "Invalid input: need array and target"
     });
     return steps;
@@ -437,11 +457,13 @@ export function getLinearSearchSteps(arr) {
 
   const target = arr[arr.length - 1];
   const searchArr = arr.slice(0, -1);
+  const failed = [];
 
   steps.push({
     array: [...searchArr],
     active: [],
-    swapped: false,
+    failed: [],
+    targetValue: target,
     message: `Starting Linear Search for target: ${target}`
   });
 
@@ -449,7 +471,8 @@ export function getLinearSearchSteps(arr) {
     steps.push({
       array: [...searchArr],
       active: [i],
-      swapped: false,
+      failed: [...failed],
+      targetValue: target,
       message: `Checking element ${searchArr[i]} at index ${i}`
     });
 
@@ -457,19 +480,32 @@ export function getLinearSearchSteps(arr) {
       steps.push({
         array: [...searchArr],
         active: [i],
-        swapped: true,
+        failed: [...failed],
         targetIndex: i,
-        message: `Found target ${target} at index ${i}!`
+        targetValue: target,
+        found: true,
+        message: `Match Found! ${target} is at index ${i}!`
       });
       return steps;
     }
+
+    failed.push(i);
+    steps.push({
+      array: [...searchArr],
+      active: [i],
+      failed: [...failed],
+      targetValue: target,
+      message: `${searchArr[i]} does not match ${target}. Moving to next index.`
+    });
   }
 
   steps.push({
     array: [...searchArr],
     active: [],
-    swapped: false,
-    message: `Target ${target} not found in the array`
+    failed: [...failed],
+    targetValue: target,
+    found: false,
+    message: `Target ${target} not found in the array.`
   });
 
   return steps;

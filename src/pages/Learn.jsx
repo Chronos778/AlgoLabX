@@ -414,6 +414,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
                     {currentStepData ? (
                       <SmartVisualizer
                         algorithmType={currentAlgo.type}
+                        algorithmName={selectedAlgorithm}
                         stepData={currentStepData}
                         array={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? currentStepData.array : undefined}
                         activeIndices={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? currentStepData.active : undefined}

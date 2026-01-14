@@ -294,18 +294,11 @@ export function getTwoPointerSearchSteps(inputArr) {
 
   steps.push({
     array: [...arr],
-    active: [],
-    target: targetSum,
+    pointers: { left: 0, right: arr.length - 1 },
+    currentSum: null,
+    targetValue: targetSum,
     found: false,
     message: `Starting Two-Pointer Search for pair with sum: ${targetSum}`
-  });
-
-  steps.push({
-    array: [...arr],
-    active: [],
-    target: targetSum,
-    found: false,
-    message: "Array sorted for two-pointer technique"
   });
 
   let left = 0;
@@ -317,38 +310,44 @@ export function getTwoPointerSearchSteps(inputArr) {
 
     steps.push({
       array: [...arr],
-      active: [left, right],
-      target: targetSum,
+      pointers: { left, right },
+      currentSum,
+      targetValue: targetSum,
       found: false,
-      message: `Checking arr[${left}] + arr[${right}] = ${arr[left]} + ${arr[right]} = ${currentSum}`
+      message: `Checking: ${arr[left]} + ${arr[right]} = ${currentSum}`
     });
 
     if (currentSum === targetSum) {
       found = true;
       steps.push({
         array: [...arr],
-        active: [left, right],
-        target: targetSum,
+        pointers: { left, right },
+        currentSum,
+        targetValue: targetSum,
         found: true,
-        message: `Found pair (${arr[left]}, ${arr[right]}) with sum ${targetSum}!`
+        message: `Match Found! Pair (${arr[left]}, ${arr[right]}) sums to ${targetSum}.`
       });
       break;
     } else if (currentSum < targetSum) {
       steps.push({
         array: [...arr],
-        active: [left],
-        target: targetSum,
+        pointers: { left, right },
+        currentSum,
+        targetValue: targetSum,
         found: false,
-        message: `Sum ${currentSum} < ${targetSum}, moving left pointer right`
+        action: 'move_left',
+        message: `${currentSum} < ${targetSum}. Increasing left pointer to increase sum.`
       });
       left++;
     } else {
       steps.push({
         array: [...arr],
-        active: [right],
-        target: targetSum,
+        pointers: { left, right },
+        currentSum,
+        targetValue: targetSum,
         found: false,
-        message: `Sum ${currentSum} > ${targetSum}, moving right pointer left`
+        action: 'move_right',
+        message: `${currentSum} > ${targetSum}. Decreasing right pointer to reduce sum.`
       });
       right--;
     }
@@ -357,10 +356,11 @@ export function getTwoPointerSearchSteps(inputArr) {
   if (!found) {
     steps.push({
       array: [...arr],
-      active: [],
-      target: targetSum,
+      pointers: { left: -1, right: -1 },
+      currentSum: null,
+      targetValue: targetSum,
       found: false,
-      message: `No pair found with sum ${targetSum}`
+      message: `No pair found with sum ${targetSum}.`
     });
   }
 
