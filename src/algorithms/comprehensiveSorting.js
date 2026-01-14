@@ -589,75 +589,127 @@ export function* radixSortSteps(arr) {
 
 // Helper functions to get all steps
 export function getBubbleSortSteps(arr) {
-  // Simple implementation that returns steps directly
+  // Simple implementation that returns steps directly with sorted tracking
   const steps = [];
   const workArray = [...arr]; // Create a copy to work with
   const n = workArray.length;
+  const sorted = []; // Track sorted indices
   
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Starting Bubble Sort"
+    sorted: [...sorted],
+    message: "Starting Bubble Sort - comparing adjacent elements and swapping if needed"
   });
   
   for (let i = 0; i < n - 1; i++) {
+    let swappedThisPass = false;
+    
     for (let j = 0; j < n - i - 1; j++) {
       steps.push({
         array: [...workArray],
         active: [j, j + 1],
         swapped: false,
-        message: `Comparing elements at positions ${j} and ${j + 1}`
+        sorted: [...sorted],
+        message: `Comparing ${workArray[j]} and ${workArray[j + 1]}`
       });
       
       if (workArray[j] > workArray[j + 1]) {
         [workArray[j], workArray[j + 1]] = [workArray[j + 1], workArray[j]];
+        swappedThisPass = true;
         steps.push({
           array: [...workArray],
           active: [j, j + 1],
           swapped: true,
-          message: `Swapped elements at positions ${j} and ${j + 1}`
+          sorted: [...sorted],
+          message: `Swapped ${workArray[j]} and ${workArray[j + 1]}`
         });
       }
     }
+    
+    // Mark the last element of this pass as sorted
+    sorted.push(n - 1 - i);
+    steps.push({
+      array: [...workArray],
+      active: [],
+      swapped: false,
+      sorted: [...sorted],
+      message: `Pass ${i + 1} complete - element at position ${n - 1 - i} is now in its final position`
+    });
+    
+    // Early exit if no swaps occurred
+    if (!swappedThisPass) {
+      // Mark all remaining as sorted
+      for (let k = 0; k < n - i - 1; k++) {
+        if (!sorted.includes(k)) sorted.push(k);
+      }
+      break;
+    }
   }
   
+  // Mark all as sorted at the end
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Bubble Sort completed"
+    sorted: allSorted,
+    message: "Bubble Sort completed! Array is now fully sorted."
   });
   
   return steps;
 }
 
 export function getSelectionSortSteps(arr) {
-  // Simple implementation that returns steps directly
+  // Simple implementation that returns steps directly with sorted tracking
   const steps = [];
   const workArray = [...arr]; // Create a copy to work with
   const n = workArray.length;
+  const sorted = []; // Track sorted indices
   
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Starting Selection Sort"
+    sorted: [...sorted],
+    minIdx: undefined,
+    message: "Starting Selection Sort - finding minimum element in each pass"
   });
   
   for (let i = 0; i < n - 1; i++) {
     let minIdx = i;
     
+    steps.push({
+      array: [...workArray],
+      active: [i],
+      swapped: false,
+      sorted: [...sorted],
+      minIdx: minIdx,
+      message: `Pass ${i + 1}: Looking for minimum element starting from position ${i}`
+    });
+    
     for (let j = i + 1; j < n; j++) {
       steps.push({
         array: [...workArray],
-        active: [minIdx, j],
+        active: [j],
         swapped: false,
-        message: `Comparing elements at positions ${minIdx} and ${j}`
+        sorted: [...sorted],
+        minIdx: minIdx,
+        checkIdx: j,
+        message: `Comparing ${workArray[j]} with current minimum ${workArray[minIdx]}`
       });
       
       if (workArray[j] < workArray[minIdx]) {
         minIdx = j;
+        steps.push({
+          array: [...workArray],
+          active: [j],
+          swapped: false,
+          sorted: [...sorted],
+          minIdx: minIdx,
+          message: `New minimum found: ${workArray[minIdx]} at position ${minIdx}`
+        });
       }
     }
     
@@ -667,32 +719,49 @@ export function getSelectionSortSteps(arr) {
         array: [...workArray],
         active: [i, minIdx],
         swapped: true,
-        message: `Swapped minimum element to position ${i}`
+        sorted: [...sorted],
+        message: `Swapped minimum ${workArray[i]} to position ${i}`
       });
     }
+    
+    // Mark position i as sorted
+    sorted.push(i);
+    steps.push({
+      array: [...workArray],
+      active: [],
+      swapped: false,
+      sorted: [...sorted],
+      message: `Position ${i} is now sorted with value ${workArray[i]}`
+    });
   }
   
+  // Mark last element as sorted
+  sorted.push(n - 1);
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Selection Sort completed"
+    sorted: [...sorted],
+    message: "Selection Sort completed! Array is now fully sorted."
   });
   
   return steps;
 }
 
 export function getInsertionSortSteps(arr) {
-  // Simple implementation that returns steps directly
+  // Simple implementation that returns steps directly with sorted tracking
   const steps = [];
   const workArray = [...arr]; // Create a copy to work with
   const n = workArray.length;
+  const sorted = [0]; // First element is always "sorted" initially
   
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Starting Insertion Sort"
+    sorted: [...sorted],
+    keyIdx: undefined,
+    message: "Starting Insertion Sort - building sorted portion one element at a time"
   });
   
   for (let i = 1; i < n; i++) {
@@ -701,9 +770,11 @@ export function getInsertionSortSteps(arr) {
     
     steps.push({
       array: [...workArray],
-      active: [i],
+      active: [],
       swapped: false,
-      message: `Inserting element ${key} at position ${i}`
+      sorted: [...sorted],
+      keyIdx: i,
+      message: `Inserting element ${key} from position ${i} into sorted portion`
     });
     
     while (j >= 0 && workArray[j] > key) {
@@ -711,7 +782,9 @@ export function getInsertionSortSteps(arr) {
         array: [...workArray],
         active: [j, j + 1],
         swapped: false,
-        message: `Comparing ${workArray[j]} with ${key}`
+        sorted: [...sorted],
+        keyIdx: j + 1,
+        message: `${workArray[j]} > ${key}, shifting ${workArray[j]} to the right`
       });
       
       workArray[j + 1] = workArray[j];
@@ -719,26 +792,37 @@ export function getInsertionSortSteps(arr) {
         array: [...workArray],
         active: [j, j + 1],
         swapped: true,
-        message: `Shifting element ${workArray[j]} to the right`
+        sorted: [...sorted],
+        keyIdx: j,
+        message: `Shifted ${workArray[j + 1]} from position ${j} to ${j + 1}`
       });
       
       j--;
     }
     
     workArray[j + 1] = key;
+    
+    // Update sorted portion - all elements from 0 to i are now sorted
+    sorted.length = 0;
+    for (let k = 0; k <= i; k++) sorted.push(k);
+    
     steps.push({
       array: [...workArray],
       active: [j + 1],
       swapped: true,
-      message: `Inserted ${key} at position ${j + 1}`
+      sorted: [...sorted],
+      message: `Placed ${key} at position ${j + 1} - sorted portion now has ${i + 1} elements`
     });
   }
   
+  // All elements are sorted
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Insertion Sort completed"
+    sorted: allSorted,
+    message: "Insertion Sort completed! Array is now fully sorted."
   });
   
   return steps;
@@ -748,11 +832,13 @@ export function getMergeSortSteps(arr) {
   // Simple implementation that returns steps directly
   const steps = [];
   const workArray = [...arr]; // Create a copy to work with
+  const sorted = []; // Track sorted indices
   
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
+    sorted: [...sorted],
     message: "Starting Merge Sort"
   });
   
@@ -765,6 +851,7 @@ export function getMergeSortSteps(arr) {
       array: [...workArray],
       active: [],
       swapped: false,
+      sorted: [...sorted],
       message: `Merging [${left.join(', ')}] and [${right.join(', ')}]`
     });
     
@@ -773,6 +860,7 @@ export function getMergeSortSteps(arr) {
         array: [...workArray],
         active: [startIdx + i, startIdx + left.length + j],
         swapped: false,
+        sorted: [...sorted],
         message: `Comparing ${left[i]} and ${right[j]}`
       });
       
@@ -782,6 +870,7 @@ export function getMergeSortSteps(arr) {
           array: [...workArray],
           active: [k],
           swapped: true,
+          sorted: [...sorted],
           message: `Placed ${left[i]} at position ${k}`
         });
         merged.push(left[i]);
@@ -792,6 +881,7 @@ export function getMergeSortSteps(arr) {
           array: [...workArray],
           active: [k],
           swapped: true,
+          sorted: [...sorted],
           message: `Placed ${right[j]} at position ${k}`
         });
         merged.push(right[j]);
@@ -806,6 +896,7 @@ export function getMergeSortSteps(arr) {
         array: [...workArray],
         active: [k],
         swapped: true,
+        sorted: [...sorted],
         message: `Placed remaining ${left[i]} at position ${k}`
       });
       merged.push(left[i]);
@@ -819,6 +910,7 @@ export function getMergeSortSteps(arr) {
         array: [...workArray],
         active: [k],
         swapped: true,
+        sorted: [...sorted],
         message: `Placed remaining ${right[j]} at position ${k}`
       });
       merged.push(right[j]);
@@ -838,6 +930,7 @@ export function getMergeSortSteps(arr) {
       array: [...workArray],
       active: [],
       swapped: false,
+      sorted: [...sorted],
       message: `Dividing array from index ${start} to ${end}`
     });
     
@@ -851,11 +944,13 @@ export function getMergeSortSteps(arr) {
   
   mergeSort(0, workArray.length);
   
+  const allSorted = Array.from({ length: workArray.length }, (_, i) => i);
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Merge Sort completed"
+    sorted: allSorted,
+    message: "Merge Sort completed! Array is now fully sorted."
   });
   
   return steps;
@@ -865,11 +960,13 @@ export function getQuickSortSteps(arr) {
   // Simple implementation that returns steps directly
   const steps = [];
   const workArray = [...arr]; // Create a copy to work with
+  const sorted = []; // Track sorted indices
   
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
+    sorted: [...sorted],
     message: "Starting Quick Sort"
   });
   
@@ -881,6 +978,7 @@ export function getQuickSortSteps(arr) {
       array: [...workArray],
       active: [high],
       swapped: false,
+      sorted: [...sorted],
       message: `Pivot selected: ${pivot} at position ${high}`
     });
     
@@ -889,6 +987,7 @@ export function getQuickSortSteps(arr) {
         array: [...workArray],
         active: [j, high],
         swapped: false,
+        sorted: [...sorted],
         message: `Comparing ${workArray[j]} with pivot ${pivot}`
       });
       
@@ -899,6 +998,7 @@ export function getQuickSortSteps(arr) {
           array: [...workArray],
           active: [i, j],
           swapped: true,
+          sorted: [...sorted],
           message: `Swapped ${workArray[j]} with ${workArray[i]}`
         });
       }
@@ -909,6 +1009,7 @@ export function getQuickSortSteps(arr) {
       array: [...workArray],
       active: [i + 1, high],
       swapped: true,
+      sorted: [...sorted],
       message: `Placed pivot ${pivot} at position ${i + 1}`
     });
     
@@ -925,11 +1026,13 @@ export function getQuickSortSteps(arr) {
   
   quickSort(0, workArray.length - 1);
   
+  const allSorted = Array.from({ length: workArray.length }, (_, i) => i);
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Quick Sort completed"
+    sorted: allSorted,
+    message: "Quick Sort completed! Array is now fully sorted."
   });
   
   return steps;
@@ -940,11 +1043,13 @@ export function getHeapSortSteps(arr) {
   const steps = [];
   const workArray = [...arr]; // Create a copy to work with
   const n = workArray.length;
+  const sorted = []; // Track sorted indices
   
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
+    sorted: [...sorted],
     message: "Starting Heap Sort"
   });
   
@@ -958,6 +1063,7 @@ export function getHeapSortSteps(arr) {
         array: [...workArray],
         active: [largest, left],
         swapped: false,
+        sorted: [...sorted],
         message: `Comparing parent ${workArray[largest]} with left child ${workArray[left]}`
       });
       
@@ -971,6 +1077,7 @@ export function getHeapSortSteps(arr) {
         array: [...workArray],
         active: [largest, right],
         swapped: false,
+        sorted: [...sorted],
         message: `Comparing largest ${workArray[largest]} with right child ${workArray[right]}`
       });
       
@@ -985,6 +1092,7 @@ export function getHeapSortSteps(arr) {
         array: [...workArray],
         active: [i, largest],
         swapped: true,
+        sorted: [...sorted],
         message: `Swapped ${workArray[largest]} with ${workArray[i]}`
       });
       heapify(n, largest);
@@ -997,6 +1105,7 @@ export function getHeapSortSteps(arr) {
       array: [...workArray],
       active: [i],
       swapped: false,
+      sorted: [...sorted],
       message: `Building max heap, starting at index ${i}`
     });
     heapify(n, i);
@@ -1004,38 +1113,44 @@ export function getHeapSortSteps(arr) {
   
   // Extract elements from heap
   for (let i = n - 1; i > 0; i--) {
+    sorted.push(i); // Mark as sorted after moving to correct position
     [workArray[0], workArray[i]] = [workArray[i], workArray[0]];
     steps.push({
       array: [...workArray],
       active: [0, i],
       swapped: true,
+      sorted: [...sorted],
       message: `Swapped max element ${workArray[i]} to position ${i}`
     });
     heapify(i, 0);
   }
   
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Heap Sort completed"
+    sorted: allSorted,
+    message: "Heap Sort completed! Array is now fully sorted."
   });
   
   return steps;
 }
 
 export function getCountingSortSteps(arr) {
-  // Simple implementation that returns steps directly
+  // Simple implementation that returns steps directly with sorted tracking
   const steps = [];
   const workArray = [...arr]; // Create a copy to work with
   const n = workArray.length;
   const max = Math.max(...workArray);
+  const sorted = [];
   
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Starting Counting Sort"
+    sorted: [...sorted],
+    message: "Starting Counting Sort - a non-comparison sorting algorithm"
   });
   
   // Create count array
@@ -1045,7 +1160,8 @@ export function getCountingSortSteps(arr) {
     array: [...workArray],
     active: [],
     swapped: false,
-    message: `Created count array of size ${max + 1}`
+    sorted: [...sorted],
+    message: `Created count array of size ${max + 1} to store frequency of each element`
   });
   
   // Store count of each element
@@ -1055,7 +1171,8 @@ export function getCountingSortSteps(arr) {
       array: [...workArray],
       active: [i],
       swapped: false,
-      message: `Counted element ${workArray[i]}, count[${workArray[i]}] = ${count[workArray[i]]}`
+      sorted: [...sorted],
+      message: `Counted element ${workArray[i]}, frequency is now ${count[workArray[i]]}`
     });
   }
   
@@ -1066,7 +1183,8 @@ export function getCountingSortSteps(arr) {
       array: [...workArray],
       active: [],
       swapped: false,
-      message: `Cumulative count: count[${i}] = ${count[i]}`
+      sorted: [...sorted],
+      message: `Cumulative count: elements ≤ ${i} appear ${count[i]} times`
     });
   }
   
@@ -1077,11 +1195,15 @@ export function getCountingSortSteps(arr) {
     output[position] = workArray[i];
     count[workArray[i]]--;
     
+    // Mark position as sorted
+    sorted.push(position);
+    
     steps.push({
       array: [...output],
       active: [position],
       swapped: true,
-      message: `Placed ${workArray[i]} at position ${position}`
+      sorted: [...sorted],
+      message: `Placed ${workArray[i]} at final position ${position}`
     });
   }
   
@@ -1090,36 +1212,43 @@ export function getCountingSortSteps(arr) {
     workArray[i] = output[i];
   }
   
+  // Mark all as sorted
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Counting Sort completed"
+    sorted: allSorted,
+    message: "Counting Sort completed! Array is now fully sorted."
   });
   
   return steps;
 }
 
 export function getRadixSortSteps(arr) {
-  // Simple implementation that returns steps directly
+  // Simple implementation that returns steps directly with sorted tracking
   const steps = [];
   const workArray = [...arr]; // Create a copy to work with
   const n = workArray.length;
   const max = Math.max(...workArray);
+  const sorted = [];
   
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Starting Radix Sort"
+    sorted: [...sorted],
+    message: "Starting Radix Sort - sorting by individual digits from least to most significant"
   });
   
+  let digitPlace = 1;
   for (let exp = 1; Math.floor(max / exp) > 0; exp *= 10) {
     steps.push({
       array: [...workArray],
       active: [],
       swapped: false,
-      message: `Sorting by digit place ${exp}`
+      sorted: [...sorted],
+      message: `Sorting by ${digitPlace === 1 ? 'ones' : digitPlace === 10 ? 'tens' : digitPlace === 100 ? 'hundreds' : `${digitPlace}s`} digit (place value: ${exp})`
     });
     
     // Counting sort for current digit
@@ -1134,7 +1263,8 @@ export function getRadixSortSteps(arr) {
         array: [...workArray],
         active: [i],
         swapped: false,
-        message: `Digit ${digit} found in ${workArray[i]} at position ${i}`
+        sorted: [...sorted],
+        message: `${workArray[i]} has digit ${digit} in ${digitPlace === 1 ? 'ones' : digitPlace === 10 ? 'tens' : digitPlace === 100 ? 'hundreds' : `${digitPlace}s`} place`
       });
     }
     
@@ -1149,10 +1279,11 @@ export function getRadixSortSteps(arr) {
       output[count[digit] - 1] = workArray[i];
       count[digit]--;
       steps.push({
-        array: [...output],
+        array: [...output.map(v => v || 0)],
         active: [count[digit]],
         swapped: true,
-        message: `Placed ${workArray[i]} with digit ${digit} at position ${count[digit]}`
+        sorted: [...sorted],
+        message: `Placed ${workArray[i]} at position ${count[digit]} based on digit ${digit}`
       });
     }
     
@@ -1165,15 +1296,21 @@ export function getRadixSortSteps(arr) {
       array: [...workArray],
       active: [],
       swapped: false,
-      message: `Completed sorting by digit place ${exp}`
+      sorted: [...sorted],
+      message: `Completed sorting by ${digitPlace === 1 ? 'ones' : digitPlace === 10 ? 'tens' : digitPlace === 100 ? 'hundreds' : `${digitPlace}s`} digit`
     });
+    
+    digitPlace *= 10;
   }
   
+  // Mark all as sorted
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...workArray],
     active: [],
     swapped: false,
-    message: "Radix Sort completed"
+    sorted: allSorted,
+    message: "Radix Sort completed! Array is now fully sorted."
   });
   
   return steps;

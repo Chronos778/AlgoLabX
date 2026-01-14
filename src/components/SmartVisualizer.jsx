@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ArrayVisualizer from './ArrayVisualizer';
 import ArrayBlockVisualizer from './ArrayBlockVisualizer';
 import SearchVisualizer from './SearchVisualizer';
@@ -23,33 +24,49 @@ const SmartVisualizer = ({
           return <MergeTree currentStep={stepData} />;
         }
 
-        // Use Block Visualizer for simple sorts or if sorted data is present
-        // This implicitly enables it for Bubble, Selection, Insertion if we pass sortedIndices
-        // We can also force it if we know the algorithm name, but SmartVisualizer currently only gets type.
-        // However, checking for 'sorted' prop in stepData is a good heuristic, or we can just default to it 
-        // if we want to replace the bar chart permanently for these.
-        // The prompt asked to "update in learn and compare", implying a pervasive change.
-        // Let's rely on the presence of specific props or just use it as the default for arrays 
-        // if it looks like a comparison sort step context.
-
-        // For now, let's use ArrayBlockVisualizer if 'sorted' property exists in stepData 
-        // (which we will add to the algorithms) OR if it's explicitly one of the target algos.
-        // Since we don't have algo name here easily without props drilling or deduction, 
-        // let's rely on the new data shape we are about to create.
-
-        if (props.useBlockVisualizer || stepData?.sorted || (stepData?.description && (stepData.description.includes('Bubble') || stepData.description.includes('Selection') || stepData.description.includes('Insertion')))) {
+        // Use Block Visualizer for sorting algorithms with sorted tracking
+        if (props.useBlockVisualizer || stepData?.sorted) {
           return (
-            <ArrayBlockVisualizer
-              array={props.array || []}
-              activeIndices={props.activeIndices || []}
-              swappedIndices={props.swappedIndices || []}
-              sortedIndices={stepData?.sorted || []}
-              specialIndices={{
-                min: stepData?.minIdx,
-                key: stepData?.keyIdx,
-                check: stepData?.checkIdx
-              }}
-            />
+            <div className="w-full flex flex-col items-center gap-4">
+              {/* Message Banner - Like HeapSort */}
+              {stepData?.message && (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={stepData.message}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="text-[#9d4edd] text-xs sm:text-sm uppercase tracking-[0.15em] font-bold bg-[#9d4edd]/10 px-4 py-2 rounded-lg border border-[#9d4edd]/30 text-center max-w-full"
+                  >
+                    {stepData.message}
+                  </motion.div>
+                </AnimatePresence>
+              )}
+              
+              <ArrayBlockVisualizer
+                array={props.array || stepData?.array || []}
+                activeIndices={props.activeIndices || stepData?.active || []}
+                swappedIndices={props.swappedIndices || []}
+                sortedIndices={stepData?.sorted || []}
+                specialIndices={{
+                  min: stepData?.minIdx,
+                  key: stepData?.keyIdx,
+                  check: stepData?.checkIdx
+                }}
+              />
+              
+              {/* Array Indices - Like HeapSort */}
+              <div className="flex justify-center gap-1 sm:gap-2 px-2 flex-wrap">
+                {(props.array || stepData?.array || []).map((_, idx) => (
+                  <div 
+                    key={idx} 
+                    className="text-white/50 text-[10px] sm:text-xs font-mono min-w-[2rem] sm:min-w-[3rem] text-center"
+                  >
+                    {idx}
+                  </div>
+                ))}
+              </div>
+            </div>
           );
         }
 
@@ -66,13 +83,30 @@ const SmartVisualizer = ({
 
       case 'searching':
         return (
-          <SearchVisualizer
-            array={stepData?.array || []}
-            activeIndices={stepData?.active || []}
-            pointerIndex={stepData?.pointerIndex || -1}
-            targetIndex={stepData?.targetIndex || -1}
-            maxValue={props.maxValue || 100}
-          />
+          <div className="w-full flex flex-col items-center gap-4">
+            {/* Message Banner */}
+            {stepData?.message && (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={stepData.message}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-[#06b6d4] text-xs sm:text-sm uppercase tracking-[0.15em] font-bold bg-[#06b6d4]/10 px-4 py-2 rounded-lg border border-[#06b6d4]/30 text-center max-w-full"
+                >
+                  {stepData.message}
+                </motion.div>
+              </AnimatePresence>
+            )}
+            
+            <SearchVisualizer
+              array={stepData?.array || []}
+              activeIndices={stepData?.active || []}
+              pointerIndex={stepData?.pointerIndex || -1}
+              targetIndex={stepData?.targetIndex || -1}
+              maxValue={props.maxValue || 100}
+            />
+          </div>
         );
 
       case 'graph':
@@ -85,26 +119,50 @@ const SmartVisualizer = ({
           );
         }
         return (
-          <GraphVisualizer
-            nodes={stepData?.nodes || []}
-            edges={stepData?.edges || []}
-            visitedNodes={stepData?.visited || []}
-            currentNode={stepData?.current || -1}
-            activeNodes={stepData?.active || []}
-            message={stepData?.message || ''}
-            shortestPath={stepData?.shortestPath || []}
-          />
+          <div className="w-full flex flex-col items-center gap-4">
+            {/* Message Banner */}
+            {stepData?.message && (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={stepData.message}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-[#10b981] text-xs sm:text-sm uppercase tracking-[0.15em] font-bold bg-[#10b981]/10 px-4 py-2 rounded-lg border border-[#10b981]/30 text-center max-w-full"
+                >
+                  {stepData.message}
+                </motion.div>
+              </AnimatePresence>
+            )}
+            
+            <GraphVisualizer
+              currentStep={stepData}
+            />
+          </div>
         );
 
       case 'dp':
         return (
-          <DPVisualizer
-            dpTable={stepData?.dpTable || []}
-            currentItem={stepData?.currentItem || -1}
-            currentCapacity={stepData?.currentCapacity || -1}
-            itemWeights={stepData?.itemWeights || []}
-            itemValues={stepData?.itemValues || []}
-          />
+          <div className="w-full flex flex-col items-center gap-4">
+            {/* Message Banner */}
+            {stepData?.message && (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={stepData.message}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-[#8b5cf6] text-xs sm:text-sm uppercase tracking-[0.15em] font-bold bg-[#8b5cf6]/10 px-4 py-2 rounded-lg border border-[#8b5cf6]/30 text-center max-w-full"
+                >
+                  {stepData.message}
+                </motion.div>
+              </AnimatePresence>
+            )}
+            
+            <DPVisualizer
+              currentStep={stepData}
+            />
+          </div>
         );
 
       case 'os':

@@ -3,14 +3,22 @@ import { motion } from 'framer-motion';
 import SmartVisualizer from '../components/SmartVisualizer';
 import HeapSortVisualizer from '../components/HeapSortVisualizer';
 import QuickSortVisualizer from '../components/QuickSort3D'; // 2D Tile Implementation
+import GraphVisualizer from '../components/GraphVisualizer';
+import DPVisualizer from '../components/DPVisualizer';
 import { useStepPlayer } from '../engine/stepPlayer';
 import {
   getBubbleSortSteps, getSelectionSortSteps, getInsertionSortSteps, getMergeSortSteps, getMergeSortTreeSteps,
   getCountingSortSteps, getRadixSortSteps,
-  getBinarySearchSteps, getLinearSearchSteps, getJumpSearchSteps, getInterpolationSearchSteps, getExponentialSearchSteps
+  getShellSortSteps, getBucketSortSteps, getCocktailSortSteps, getCombSortSteps, getGnomeSortSteps, getOddEvenSortSteps,
+  getBinarySearchSteps, getLinearSearchSteps, getJumpSearchSteps, getInterpolationSearchSteps, getExponentialSearchSteps,
+  getTernarySearchSteps, getFibonacciSearchSteps, getSentinelSearchSteps, getTwoPointerSearchSteps
 } from '../algorithms/comprehensiveAlgorithms';
 import { getHeapSortDetailedSteps } from '../algorithms/heapSortDetailed';
 import { getQuickSort3DSteps as getQuickSortDetailedSteps } from '../algorithms/quickSort3D';
+import { bfsSteps, dfsSteps, dijkstraSteps } from '../algorithms/comprehensiveAlgorithms';
+import { getBellmanFordSteps, getFloydWarshallSteps, getPrimMSTSteps, getKruskalMSTSteps, getTopologicalSortSteps, getCycleDetectionSteps } from '../algorithms/graph/additionalGraphAlgorithms';
+import { getLCSSteps, getEditDistanceSteps, getCoinChangeSteps, getMatrixChainSteps, getRodCuttingSteps, getLISSteps, getFibonacciDPSteps } from '../algorithms/dp/additionalDPAlgorithms';
+import { getKnapsackSteps } from '../algorithms/knapsack';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // Icon Components
@@ -82,23 +90,56 @@ const Compare = () => {
   const speed = baseSpeed / speedMultiplier;
 
   const algorithms = {
+    // Simple Sorts (O(n²))
     bubble: { name: 'Bubble Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getBubbleSortSteps, color: '#6b7280' },
     selection: { name: 'Selection Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getSelectionSortSteps, color: '#f59e0b' },
     insertion: { name: 'Insertion Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getInsertionSortSteps, color: '#8b5cf6' },
+    cocktail: { name: 'Cocktail Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getCocktailSortSteps, color: '#14b8a6' },
+    gnome: { name: 'Gnome Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getGnomeSortSteps, color: '#f97316' },
+    comb: { name: 'Comb Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getCombSortSteps, color: '#06b6d4' },
+    oddeven: { name: 'Odd-Even Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getOddEvenSortSteps, color: '#84cc16' },
+    // Efficient Sorts (O(n log n))
     merge: { name: 'Merge Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getMergeSortTreeSteps, color: '#10b981' },
     quick: { name: 'Quick Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getQuickSortDetailedSteps, color: '#a1a1ab' },
     heap: { name: 'Heap Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getHeapSortDetailedSteps, color: '#ec4899' },
+    shell: { name: 'Shell Sort', complexity: 'O(n log² n)', type: 'sorting', getSteps: getShellSortSteps, color: '#8b5cf6' },
+    // Non-Comparison Sorts
     counting: { name: 'Counting Sort', complexity: 'O(n + k)', type: 'sorting', getSteps: getCountingSortSteps, color: '#f97316' },
     radix: { name: 'Radix Sort', complexity: 'O(d × (n + k))', type: 'sorting', getSteps: getRadixSortSteps, color: '#a855f7' },
+    bucket: { name: 'Bucket Sort', complexity: 'O(n + k)', type: 'sorting', getSteps: getBucketSortSteps, color: '#eab308' },
+    // Search Algorithms
     binary: { name: 'Binary Search', complexity: 'O(log n)', type: 'searching', getSteps: getBinarySearchSteps, color: '#3f3f48' },
     linear: { name: 'Linear Search', complexity: 'O(n)', type: 'searching', getSteps: getLinearSearchSteps, color: '#84cc16' },
     jump: { name: 'Jump Search', complexity: 'O(√n)', type: 'searching', getSteps: getJumpSearchSteps, color: '#eab308' },
     interpolation: { name: 'Interpolation Search', complexity: 'O(log log n)', type: 'searching', getSteps: getInterpolationSearchSteps, color: '#06b6d4' },
     exponential: { name: 'Exponential Search', complexity: 'O(log n)', type: 'searching', getSteps: getExponentialSearchSteps, color: '#f43f5e' },
+    ternary: { name: 'Ternary Search', complexity: 'O(log₃ n)', type: 'searching', getSteps: getTernarySearchSteps, color: '#8b5cf6' },
+    fibonacci: { name: 'Fibonacci Search', complexity: 'O(log n)', type: 'searching', getSteps: getFibonacciSearchSteps, color: '#ec4899' },
+    sentinel: { name: 'Sentinel Search', complexity: 'O(n)', type: 'searching', getSteps: getSentinelSearchSteps, color: '#14b8a6' },
+    twopointer: { name: 'Two Pointer Search', complexity: 'O(n)', type: 'searching', getSteps: getTwoPointerSearchSteps, color: '#f97316' },
+    // Graph Algorithms
+    bfs: { name: 'Breadth-First Search', complexity: 'O(V + E)', type: 'graph', getSteps: bfsSteps, color: '#06b6d4' },
+    dfs: { name: 'Depth-First Search', complexity: 'O(V + E)', type: 'graph', getSteps: dfsSteps, color: '#3b82f6' },
+    dijkstra: { name: 'Dijkstra\'s Algorithm', complexity: 'O(V²)', type: 'graph', getSteps: dijkstraSteps, color: '#8b5cf6' },
+    bellmanford: { name: 'Bellman-Ford', complexity: 'O(V × E)', type: 'graph', getSteps: getBellmanFordSteps, color: '#ec4899' },
+    floydwarshall: { name: 'Floyd-Warshall', complexity: 'O(V³)', type: 'graph', getSteps: getFloydWarshallSteps, color: '#f97316' },
+    prim: { name: 'Prim\'s MST', complexity: 'O(V²)', type: 'graph', getSteps: getPrimMSTSteps, color: '#14b8a6' },
+    kruskal: { name: 'Kruskal\'s MST', complexity: 'O(E log E)', type: 'graph', getSteps: getKruskalMSTSteps, color: '#10b981' },
+    topological: { name: 'Topological Sort', complexity: 'O(V + E)', type: 'graph', getSteps: getTopologicalSortSteps, color: '#84cc16' },
+    cycledetection: { name: 'Cycle Detection', complexity: 'O(V + E)', type: 'graph', getSteps: getCycleDetectionSteps, color: '#f43f5e' },
+    // Dynamic Programming Algorithms
+    lcs: { name: 'Longest Common Subsequence', complexity: 'O(m × n)', type: 'dp', getSteps: getLCSSteps, color: '#06b6d4' },
+    editdistance: { name: 'Edit Distance', complexity: 'O(m × n)', type: 'dp', getSteps: getEditDistanceSteps, color: '#3b82f6' },
+    coinchange: { name: 'Coin Change', complexity: 'O(n × c)', type: 'dp', getSteps: getCoinChangeSteps, color: '#8b5cf6' },
+    matrixchain: { name: 'Matrix Chain', complexity: 'O(n³)', type: 'dp', getSteps: getMatrixChainSteps, color: '#ec4899' },
+    rodcutting: { name: 'Rod Cutting', complexity: 'O(n²)', type: 'dp', getSteps: getRodCuttingSteps, color: '#f97316' },
+    lis: { name: 'Longest Increasing Subsequence', complexity: 'O(n²)', type: 'dp', getSteps: getLISSteps, color: '#14b8a6' },
+    fibonaccidp: { name: 'Fibonacci DP', complexity: 'O(n)', type: 'dp', getSteps: getFibonacciDPSteps, color: '#10b981' },
+    knapsack: { name: 'Knapsack Problem', complexity: 'O(n × c)', type: 'dp', getSteps: getKnapsackSteps, color: '#84cc16' },
   };
 
   const getStepsWithTarget = (algo, array) => {
-    if (['binary', 'linear', 'jump', 'interpolation', 'exponential'].includes(algo)) {
+    if (['binary', 'linear', 'jump', 'interpolation', 'exponential', 'ternary', 'fibonacci', 'sentinel', 'twopointer'].includes(algo)) {
       const target = parseInt(searchTarget);
       if (!isNaN(target)) return [...array, target];
     }
@@ -171,11 +212,21 @@ const Compare = () => {
                   <option value="bubble">Bubble Sort</option>
                   <option value="selection">Selection Sort</option>
                   <option value="insertion">Insertion Sort</option>
+                  <option value="cocktail">Cocktail Sort</option>
+                  <option value="gnome">Gnome Sort</option>
+                  <option value="comb">Comb Sort</option>
+                  <option value="oddeven">Odd-Even Sort</option>
                 </optgroup>
                 <optgroup label="Efficient Sorts (O(n log n))">
                   <option value="merge">Merge Sort</option>
                   <option value="quick">Quick Sort</option>
                   <option value="heap">Heap Sort</option>
+                  <option value="shell">Shell Sort</option>
+                </optgroup>
+                <optgroup label="Non-Comparison Sorts">
+                  <option value="counting">Counting Sort</option>
+                  <option value="radix">Radix Sort</option>
+                  <option value="bucket">Bucket Sort</option>
                 </optgroup>
                 <optgroup label="Search Algorithms">
                   <option value="binary">Binary Search</option>
@@ -183,6 +234,31 @@ const Compare = () => {
                   <option value="jump">Jump Search</option>
                   <option value="interpolation">Interpolation Search</option>
                   <option value="exponential">Exponential Search</option>
+                  <option value="ternary">Ternary Search</option>
+                  <option value="fibonacci">Fibonacci Search</option>
+                  <option value="sentinel">Sentinel Search</option>
+                  <option value="twopointer">Two Pointer Search</option>
+                </optgroup>
+                <optgroup label="Graph Algorithms">
+                  <option value="bfs">Breadth-First Search</option>
+                  <option value="dfs">Depth-First Search</option>
+                  <option value="dijkstra">Dijkstra's Algorithm</option>
+                  <option value="bellmanford">Bellman-Ford</option>
+                  <option value="floydwarshall">Floyd-Warshall</option>
+                  <option value="prim">Prim's MST</option>
+                  <option value="kruskal">Kruskal's MST</option>
+                  <option value="topological">Topological Sort</option>
+                  <option value="cycledetection">Cycle Detection</option>
+                </optgroup>
+                <optgroup label="Dynamic Programming">
+                  <option value="lcs">Longest Common Subsequence</option>
+                  <option value="editdistance">Edit Distance</option>
+                  <option value="coinchange">Coin Change</option>
+                  <option value="matrixchain">Matrix Chain</option>
+                  <option value="rodcutting">Rod Cutting</option>
+                  <option value="lis">Longest Increasing Subsequence</option>
+                  <option value="fibonaccidp">Fibonacci DP</option>
+                  <option value="knapsack">Knapsack Problem</option>
                 </optgroup>
               </select>
             </div>
@@ -194,11 +270,21 @@ const Compare = () => {
                   <option value="bubble">Bubble Sort</option>
                   <option value="selection">Selection Sort</option>
                   <option value="insertion">Insertion Sort</option>
+                  <option value="cocktail">Cocktail Sort</option>
+                  <option value="gnome">Gnome Sort</option>
+                  <option value="comb">Comb Sort</option>
+                  <option value="oddeven">Odd-Even Sort</option>
                 </optgroup>
                 <optgroup label="Efficient Sorts (O(n log n))">
                   <option value="merge">Merge Sort</option>
                   <option value="quick">Quick Sort</option>
                   <option value="heap">Heap Sort</option>
+                  <option value="shell">Shell Sort</option>
+                </optgroup>
+                <optgroup label="Non-Comparison Sorts">
+                  <option value="counting">Counting Sort</option>
+                  <option value="radix">Radix Sort</option>
+                  <option value="bucket">Bucket Sort</option>
                 </optgroup>
                 <optgroup label="Search Algorithms">
                   <option value="binary">Binary Search</option>
@@ -206,6 +292,31 @@ const Compare = () => {
                   <option value="jump">Jump Search</option>
                   <option value="interpolation">Interpolation Search</option>
                   <option value="exponential">Exponential Search</option>
+                  <option value="ternary">Ternary Search</option>
+                  <option value="fibonacci">Fibonacci Search</option>
+                  <option value="sentinel">Sentinel Search</option>
+                  <option value="twopointer">Two Pointer Search</option>
+                </optgroup>
+                <optgroup label="Graph Algorithms">
+                  <option value="bfs">Breadth-First Search</option>
+                  <option value="dfs">Depth-First Search</option>
+                  <option value="dijkstra">Dijkstra's Algorithm</option>
+                  <option value="bellmanford">Bellman-Ford</option>
+                  <option value="floydwarshall">Floyd-Warshall</option>
+                  <option value="prim">Prim's MST</option>
+                  <option value="kruskal">Kruskal's MST</option>
+                  <option value="topological">Topological Sort</option>
+                  <option value="cycledetection">Cycle Detection</option>
+                </optgroup>
+                <optgroup label="Dynamic Programming">
+                  <option value="lcs">Longest Common Subsequence</option>
+                  <option value="editdistance">Edit Distance</option>
+                  <option value="coinchange">Coin Change</option>
+                  <option value="matrixchain">Matrix Chain</option>
+                  <option value="rodcutting">Rod Cutting</option>
+                  <option value="lis">Longest Increasing Subsequence</option>
+                  <option value="fibonaccidp">Fibonacci DP</option>
+                  <option value="knapsack">Knapsack Problem</option>
                 </optgroup>
               </select>
             </div>
@@ -339,6 +450,10 @@ const Compare = () => {
                   <HeapSortVisualizer currentStep={data1} isCompact={true} />
                 ) : algo1 === 'quick' ? (
                   <QuickSortVisualizer currentStep={data1} isCompact={true} />
+                ) : algorithms[algo1].type === 'graph' ? (
+                  <GraphVisualizer currentStep={data1} isCompact={true} />
+                ) : algorithms[algo1].type === 'dp' ? (
+                  <DPVisualizer currentStep={data1} isCompact={true} />
                 ) : (
                   <div className="w-full bg-[#050505] rounded-[2rem] border border-white overflow-hidden shadow-2xl p-4 sm:p-6 relative flex flex-col items-center justify-center min-h-[250px]">
                     <SmartVisualizer
@@ -348,14 +463,8 @@ const Compare = () => {
                       activeIndices={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? data1.active : undefined}
                       swappedIndices={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? (data1.swapped ? data1.active : []) : undefined}
                       maxValue={algorithms[algo1].type === 'sorting' || algorithms[algo1].type === 'searching' ? (Math.max(...inputArray) + 10) : undefined}
-                      useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven'].includes(algo1)}
+                      useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven', 'shell', 'bucket', 'counting', 'radix', 'merge', 'quick', 'heap'].includes(algo1)}
                     />
-
-                    {data1 && (data1.message || data1.description) && (
-                      <div className="mt-4 p-3 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 w-full">
-                        <p className="text-white text-xs text-center italic opacity-80">{data1.message || data1.description}</p>
-                      </div>
-                    )}
                   </div>
                 )
               )}
@@ -379,6 +488,10 @@ const Compare = () => {
                   <HeapSortVisualizer currentStep={data2} isCompact={true} />
                 ) : algo2 === 'quick' ? (
                   <QuickSortVisualizer currentStep={data2} isCompact={true} />
+                ) : algorithms[algo2].type === 'graph' ? (
+                  <GraphVisualizer currentStep={data2} isCompact={true} />
+                ) : algorithms[algo2].type === 'dp' ? (
+                  <DPVisualizer currentStep={data2} isCompact={true} />
                 ) : (
                   <div className="w-full bg-[#050505] rounded-[2rem] border border-white overflow-hidden shadow-2xl p-4 sm:p-6 relative flex flex-col items-center justify-center min-h-[250px]">
                     <SmartVisualizer
@@ -388,14 +501,8 @@ const Compare = () => {
                       activeIndices={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? data2.active : undefined}
                       swappedIndices={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? (data2.swapped ? data2.active : []) : undefined}
                       maxValue={algorithms[algo2].type === 'sorting' || algorithms[algo2].type === 'searching' ? (Math.max(...inputArray) + 10) : undefined}
-                      useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven'].includes(algo2)}
+                      useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven', 'shell', 'bucket', 'counting', 'radix', 'merge', 'quick', 'heap'].includes(algo2)}
                     />
-
-                    {data2 && (data2.message || data2.description) && (
-                      <div className="mt-4 p-3 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 w-full">
-                        <p className="text-white text-xs text-center italic opacity-80">{data2.message || data2.description}</p>
-                      </div>
-                    )}
                   </div>
                 )
               )}
