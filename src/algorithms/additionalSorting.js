@@ -6,11 +6,13 @@ export function getShellSortSteps(inputArr) {
   const arr = [...inputArr];
   const steps = [];
   const n = arr.length;
+  const sorted = [];
 
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
+    sorted: [...sorted],
     message: "Starting Shell Sort - an optimized insertion sort using gap sequences"
   });
 
@@ -20,17 +22,20 @@ export function getShellSortSteps(inputArr) {
       array: [...arr],
       active: [],
       swapped: false,
+      sorted: [],
       message: "Shell Sort completed! Array is now sorted."
     });
     return steps;
   }
+  
   // Start with a big gap, then reduce
   for (let gap = Math.floor(n / 2); gap > 0; gap = Math.floor(gap / 2)) {
     steps.push({
       array: [...arr],
       active: [],
       swapped: false,
-      message: `Using gap size: ${gap}`
+      sorted: [...sorted],
+      message: `Using gap size: ${gap} - elements ${gap} apart will be compared`
     });
 
     // Perform gapped insertion sort
@@ -42,6 +47,8 @@ export function getShellSortSteps(inputArr) {
         array: [...arr],
         active: [i],
         swapped: false,
+        sorted: [...sorted],
+        keyIdx: i,
         message: `Inserting element ${temp} at index ${i} with gap ${gap}`
       });
 
@@ -50,6 +57,7 @@ export function getShellSortSteps(inputArr) {
           array: [...arr],
           active: [j, j - gap],
           swapped: false,
+          sorted: [...sorted],
           message: `Comparing ${arr[j - gap]} > ${temp}`
         });
 
@@ -59,6 +67,7 @@ export function getShellSortSteps(inputArr) {
           array: [...arr],
           active: [j, j - gap],
           swapped: true,
+          sorted: [...sorted],
           message: `Shifted ${arr[j]} from index ${j - gap} to ${j}`
         });
 
@@ -71,17 +80,21 @@ export function getShellSortSteps(inputArr) {
           array: [...arr],
           active: [j],
           swapped: true,
+          sorted: [...sorted],
           message: `Placed ${temp} at index ${j}`
         });
       }
     }
   }
 
+  // Mark all as sorted
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
-    message: "Shell Sort completed! Array is now sorted."
+    sorted: allSorted,
+    message: "Shell Sort completed! Array is now fully sorted."
   });
 
   return steps;
@@ -92,14 +105,16 @@ export function getBucketSortSteps(inputArr) {
   const arr = [...inputArr];
   const steps = [];
   const n = arr.length;
+  const sorted = [];
 
-  if (n <= 0) return [{ array: arr, active: [], swapped: false, message: "Empty array" }];
+  if (n <= 0) return [{ array: arr, active: [], swapped: false, sorted: [], message: "Empty array" }];
 
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
-    message: "Starting Bucket Sort - distributes elements into buckets"
+    sorted: [...sorted],
+    message: "Starting Bucket Sort - distributes elements into buckets then sorts each"
   });
 
   // Find min and max
@@ -112,6 +127,7 @@ export function getBucketSortSteps(inputArr) {
     array: [...arr],
     active: [],
     swapped: false,
+    sorted: [...sorted],
     message: `Creating ${bucketCount} buckets, range: ${min}-${max}, bucket size: ${bucketSize}`
   });
 
@@ -127,6 +143,7 @@ export function getBucketSortSteps(inputArr) {
       array: [...arr],
       active: [i],
       swapped: false,
+      sorted: [...sorted],
       message: `Placing ${arr[i]} into bucket ${bucketIdx}`
     });
   }
@@ -139,6 +156,7 @@ export function getBucketSortSteps(inputArr) {
         array: [...arr],
         active: [],
         swapped: false,
+        sorted: [...sorted],
         message: `Sorting bucket ${i}: [${buckets[i].join(', ')}]`
       });
 
@@ -149,16 +167,19 @@ export function getBucketSortSteps(inputArr) {
         array: [...arr],
         active: [],
         swapped: false,
+        sorted: [...sorted],
         message: `Bucket ${i} sorted: [${buckets[i].join(', ')}]`
       });
 
-      // Place back into array
+      // Place back into array and mark as sorted
       for (const val of buckets[i]) {
         arr[index] = val;
+        sorted.push(index);
         steps.push({
           array: [...arr],
           active: [index],
           swapped: true,
+          sorted: [...sorted],
           message: `Placed ${val} at index ${index} from bucket ${i}`
         });
         index++;
@@ -166,11 +187,14 @@ export function getBucketSortSteps(inputArr) {
     }
   }
 
+  // Mark all as sorted
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
-    message: "Bucket Sort completed! Array is now sorted."
+    sorted: allSorted,
+    message: "Bucket Sort completed! Array is now fully sorted."
   });
 
   return steps;
@@ -180,14 +204,17 @@ export function getBucketSortSteps(inputArr) {
 export function getCocktailSortSteps(inputArr) {
   const arr = [...inputArr];
   const steps = [];
+  const n = arr.length;
+  const sorted = [];
   let swapped = true;
   let start = 0;
-  let end = arr.length - 1;
+  let end = n - 1;
 
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
+    sorted: [...sorted],
     message: "Starting Cocktail Shaker Sort - bidirectional bubble sort"
   });
 
@@ -199,6 +226,7 @@ export function getCocktailSortSteps(inputArr) {
       array: [...arr],
       active: [],
       swapped: false,
+      sorted: [...sorted],
       message: `Forward pass: scanning from index ${start} to ${end}`
     });
 
@@ -207,6 +235,7 @@ export function getCocktailSortSteps(inputArr) {
         array: [...arr],
         active: [i, i + 1],
         swapped: false,
+        sorted: [...sorted],
         message: `Comparing ${arr[i]} and ${arr[i + 1]}`
       });
 
@@ -217,9 +246,15 @@ export function getCocktailSortSteps(inputArr) {
           array: [...arr],
           active: [i, i + 1],
           swapped: true,
-          message: `Swapped ${arr[i + 1]} and ${arr[i]}`
+          sorted: [...sorted],
+          message: `Swapped ${arr[i]} and ${arr[i + 1]}`
         });
       }
+    }
+
+    // Mark end position as sorted after forward pass
+    if (!sorted.includes(end)) {
+      sorted.push(end);
     }
 
     if (!swapped) break;
@@ -232,6 +267,7 @@ export function getCocktailSortSteps(inputArr) {
       array: [...arr],
       active: [],
       swapped: false,
+      sorted: [...sorted],
       message: `Backward pass: scanning from index ${end} to ${start}`
     });
 
@@ -240,6 +276,7 @@ export function getCocktailSortSteps(inputArr) {
         array: [...arr],
         active: [i, i + 1],
         swapped: false,
+        sorted: [...sorted],
         message: `Comparing ${arr[i]} and ${arr[i + 1]}`
       });
 
@@ -250,19 +287,27 @@ export function getCocktailSortSteps(inputArr) {
           array: [...arr],
           active: [i, i + 1],
           swapped: true,
-          message: `Swapped ${arr[i + 1]} and ${arr[i]}`
+          sorted: [...sorted],
+          message: `Swapped ${arr[i]} and ${arr[i + 1]}`
         });
       }
     }
 
+    // Mark start position as sorted after backward pass
+    if (!sorted.includes(start)) {
+      sorted.push(start);
+    }
     start++;
   }
 
+  // Mark all as sorted
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
-    message: "Cocktail Shaker Sort completed! Array is now sorted."
+    sorted: allSorted,
+    message: "Cocktail Shaker Sort completed! Array is now fully sorted."
   });
 
   return steps;
@@ -275,28 +320,31 @@ export function getCombSortSteps(inputArr) {
   const n = arr.length;
   const shrinkFactor = 1.3;
   let gap = n;
-  let sorted = false;
+  let isSorted = false;
+  const sorted = [];
 
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
-    message: "Starting Comb Sort - bubble sort with shrinking gap"
+    sorted: [...sorted],
+    message: "Starting Comb Sort - bubble sort with shrinking gap to eliminate 'turtles'"
   });
 
-  while (!sorted) {
+  while (!isSorted) {
     // Update gap
     gap = Math.floor(gap / shrinkFactor);
     if (gap <= 1) {
       gap = 1;
-      sorted = true;
+      isSorted = true;
     }
 
     steps.push({
       array: [...arr],
       active: [],
       swapped: false,
-      message: `Using gap: ${gap}`
+      sorted: [...sorted],
+      message: `Using gap: ${gap} - comparing elements ${gap} positions apart`
     });
 
     // Compare elements with current gap
@@ -305,27 +353,32 @@ export function getCombSortSteps(inputArr) {
         array: [...arr],
         active: [i, i + gap],
         swapped: false,
+        sorted: [...sorted],
         message: `Comparing ${arr[i]} and ${arr[i + gap]} (gap: ${gap})`
       });
 
       if (arr[i] > arr[i + gap]) {
         [arr[i], arr[i + gap]] = [arr[i + gap], arr[i]];
-        sorted = false;
+        isSorted = false;
         steps.push({
           array: [...arr],
           active: [i, i + gap],
           swapped: true,
-          message: `Swapped ${arr[i + gap]} and ${arr[i]}`
+          sorted: [...sorted],
+          message: `Swapped ${arr[i]} and ${arr[i + gap]}`
         });
       }
     }
   }
 
+  // Mark all as sorted
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
-    message: "Comb Sort completed! Array is now sorted."
+    sorted: allSorted,
+    message: "Comb Sort completed! Array is now fully sorted."
   });
 
   return steps;
@@ -335,28 +388,45 @@ export function getCombSortSteps(inputArr) {
 export function getGnomeSortSteps(inputArr) {
   const arr = [...inputArr];
   const steps = [];
+  const n = arr.length;
+  const sorted = [];
   let index = 0;
 
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
-    message: "Starting Gnome Sort - a simple sorting algorithm"
+    sorted: [...sorted],
+    message: "Starting Gnome Sort - like a garden gnome sorting flower pots"
   });
 
-  while (index < arr.length) {
+  while (index < n) {
     if (index === 0) {
       index++;
     }
+
+    if (index >= n) break;
 
     steps.push({
       array: [...arr],
       active: [index - 1, index],
       swapped: false,
-      message: `At index ${index}, comparing ${arr[index - 1]} and ${arr[index]}`
+      sorted: [...sorted],
+      message: `At position ${index}, comparing ${arr[index - 1]} and ${arr[index]}`
     });
 
     if (arr[index] >= arr[index - 1]) {
+      // Update sorted portion - elements from 0 to index are in relative order
+      sorted.length = 0;
+      for (let k = 0; k <= index; k++) sorted.push(k);
+      
+      steps.push({
+        array: [...arr],
+        active: [],
+        swapped: false,
+        sorted: [...sorted],
+        message: `${arr[index]} >= ${arr[index - 1]}, moving forward. Sorted portion: 0 to ${index}`
+      });
       index++;
     } else {
       [arr[index], arr[index - 1]] = [arr[index - 1], arr[index]];
@@ -364,17 +434,21 @@ export function getGnomeSortSteps(inputArr) {
         array: [...arr],
         active: [index - 1, index],
         swapped: true,
-        message: `Swapped ${arr[index]} and ${arr[index - 1]}, moving back`
+        sorted: [...sorted],
+        message: `Swapped ${arr[index - 1]} and ${arr[index]}, stepping back`
       });
       index--;
     }
   }
 
+  // Mark all as sorted
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
-    message: "Gnome Sort completed! Array is now sorted."
+    sorted: allSorted,
+    message: "Gnome Sort completed! Array is now fully sorted."
   });
 
   return steps;
@@ -385,24 +459,27 @@ export function getOddEvenSortSteps(inputArr) {
   const arr = [...inputArr];
   const steps = [];
   const n = arr.length;
-  let sorted = false;
+  const sorted = [];
+  let isSorted = false;
 
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
-    message: "Starting Odd-Even Sort - parallel-friendly sorting"
+    sorted: [...sorted],
+    message: "Starting Odd-Even Sort - parallel-friendly brick sort"
   });
 
-  while (!sorted) {
-    sorted = true;
+  while (!isSorted) {
+    isSorted = true;
 
-    // Odd phase
+    // Odd phase - compare (1,2), (3,4), (5,6)...
     steps.push({
       array: [...arr],
       active: [],
       swapped: false,
-      message: "Odd phase: comparing pairs at odd indices"
+      sorted: [...sorted],
+      message: "Odd phase: comparing pairs at odd indices (1-2, 3-4, 5-6...)"
     });
 
     for (let i = 1; i < n - 1; i += 2) {
@@ -410,27 +487,30 @@ export function getOddEvenSortSteps(inputArr) {
         array: [...arr],
         active: [i, i + 1],
         swapped: false,
+        sorted: [...sorted],
         message: `Comparing ${arr[i]} and ${arr[i + 1]}`
       });
 
       if (arr[i] > arr[i + 1]) {
         [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
-        sorted = false;
+        isSorted = false;
         steps.push({
           array: [...arr],
           active: [i, i + 1],
           swapped: true,
-          message: `Swapped ${arr[i + 1]} and ${arr[i]}`
+          sorted: [...sorted],
+          message: `Swapped ${arr[i]} and ${arr[i + 1]}`
         });
       }
     }
 
-    // Even phase
+    // Even phase - compare (0,1), (2,3), (4,5)...
     steps.push({
       array: [...arr],
       active: [],
       swapped: false,
-      message: "Even phase: comparing pairs at even indices"
+      sorted: [...sorted],
+      message: "Even phase: comparing pairs at even indices (0-1, 2-3, 4-5...)"
     });
 
     for (let i = 0; i < n - 1; i += 2) {
@@ -438,27 +518,32 @@ export function getOddEvenSortSteps(inputArr) {
         array: [...arr],
         active: [i, i + 1],
         swapped: false,
+        sorted: [...sorted],
         message: `Comparing ${arr[i]} and ${arr[i + 1]}`
       });
 
       if (arr[i] > arr[i + 1]) {
         [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
-        sorted = false;
+        isSorted = false;
         steps.push({
           array: [...arr],
           active: [i, i + 1],
           swapped: true,
-          message: `Swapped ${arr[i + 1]} and ${arr[i]}`
+          sorted: [...sorted],
+          message: `Swapped ${arr[i]} and ${arr[i + 1]}`
         });
       }
     }
   }
 
+  // Mark all as sorted
+  const allSorted = Array.from({ length: n }, (_, i) => i);
   steps.push({
     array: [...arr],
     active: [],
     swapped: false,
-    message: "Odd-Even Sort completed! Array is now sorted."
+    sorted: allSorted,
+    message: "Odd-Even Sort completed! Array is now fully sorted."
   });
 
   return steps;

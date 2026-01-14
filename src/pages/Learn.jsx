@@ -5,6 +5,8 @@ import QuickSort2D from '../components/QuickSort2D';
 import MergeTree from '../components/MergeTree';
 import QuickSort3D from '../components/QuickSort3D';
 import HeapSortVisualizer from '../components/HeapSortVisualizer';
+import GraphVisualizer from '../components/GraphVisualizer';
+import DPVisualizer from '../components/DPVisualizer';
 import { useStepPlayer } from '../engine/stepPlayer';
 import { getHeapSortDetailedSteps } from '../algorithms/heapSortDetailed';
 import {
@@ -409,6 +411,46 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
                       <p className="text-white">Start playback to see visualization</p>
                     </div>
                   )
+                ) : currentAlgo.type === 'graph' ? (
+                  currentStepData ? (
+                    <div className="w-full bg-[#050505] rounded-[2.5rem] border border-white overflow-hidden shadow-2xl p-6 sm:p-8 relative flex flex-col items-center justify-center min-h-[350px]">
+                      <GraphVisualizer currentStep={currentStepData} />
+                      {currentStepData && (currentStepData.description || currentStepData.message) && (
+                        <motion.div
+                          key={currentStep}
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-6 p-4 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 w-full max-w-2xl"
+                        >
+                          <p className="text-white text-xs sm:text-sm text-center italic opacity-80">{currentStepData.description || currentStepData.message}</p>
+                        </motion.div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center p-12 bg-dark-900/40 rounded-xl border border-dark-700/30">
+                      <p className="text-white">Start playback to see visualization</p>
+                    </div>
+                  )
+                ) : currentAlgo.type === 'dp' ? (
+                  currentStepData ? (
+                    <div className="w-full bg-[#050505] rounded-[2.5rem] border border-white overflow-hidden shadow-2xl p-6 sm:p-8 relative flex flex-col items-center justify-center min-h-[350px]">
+                      <DPVisualizer currentStep={currentStepData} />
+                      {currentStepData && (currentStepData.description || currentStepData.message) && (
+                        <motion.div
+                          key={currentStep}
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-6 p-4 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 w-full max-w-2xl"
+                        >
+                          <p className="text-white text-xs sm:text-sm text-center italic opacity-80">{currentStepData.description || currentStepData.message}</p>
+                        </motion.div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center p-12 bg-dark-900/40 rounded-xl border border-dark-700/30">
+                      <p className="text-white">Start playback to see visualization</p>
+                    </div>
+                  )
                 ) : (
                   <div className="w-full bg-[#050505] rounded-[2.5rem] border border-white overflow-hidden shadow-2xl p-6 sm:p-8 relative flex flex-col items-center justify-center min-h-[350px]">
                     {currentStepData ? (
@@ -420,24 +462,12 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
                         activeIndices={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? currentStepData.active : undefined}
                         swappedIndices={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? (currentStepData.swapped ? currentStepData.active : []) : undefined}
                         maxValue={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? (Math.max(...inputArray) + 10) : undefined}
-                        useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven'].includes(selectedAlgorithm)}
+                        useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven', 'shell', 'bucket', 'counting', 'radix', 'merge', 'quick', 'heap'].includes(selectedAlgorithm)}
                       />
                     ) : (
                       <div className="flex items-center justify-center p-12 bg-dark-900/40 rounded-xl border border-dark-700/30">
                         <p className="text-white">No step data available</p>
                       </div>
-                    )}
-
-                    {/* Integrated Step Description */}
-                    {currentStepData && (currentStepData.description || currentStepData.message) && (
-                      <motion.div
-                        key={currentStep}
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-6 p-4 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 w-full max-w-2xl"
-                      >
-                        <p className="text-white text-xs sm:text-sm text-center italic opacity-80">{currentStepData.description || currentStepData.message}</p>
-                      </motion.div>
                     )}
                   </div>
                 )}

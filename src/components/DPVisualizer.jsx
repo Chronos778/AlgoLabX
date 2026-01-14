@@ -2,13 +2,22 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const DPVisualizer = ({
-  dpTable = [],
-  currentItem = -1,
-  currentCapacity = -1,
+  currentStep = null,
+  dpTable: propDpTable,
+  currentItem: propCurrentItem = -1,
+  currentCapacity: propCurrentCapacity = -1,
   maxValue = 100,
-  itemWeights = [],
-  itemValues = []
+  itemWeights: propItemWeights = [],
+  itemValues: propItemValues = [],
+  isCompact = false
 }) => {
+  // Extract data from currentStep if provided, otherwise use props
+  const dpTable = currentStep?.dpTable || propDpTable || [];
+  const currentItem = currentStep?.currentItem ?? propCurrentItem;
+  const currentCapacity = currentStep?.currentCapacity ?? propCurrentCapacity;
+  const itemWeights = currentStep?.itemWeights || propItemWeights;
+  const itemValues = currentStep?.itemValues || propItemValues;
+
   const getCellColor = (row, col) => {
     if (row === currentItem && col === currentCapacity) return '#7bcbe9ff'; // User Pale Blue for current cell
     if (row === currentItem || col === currentCapacity) return '#7bcbe988'; // Light blue for current row/col

@@ -2,14 +2,25 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const GraphVisualizer = ({
-  nodes = [],
-  edges = [],
-  visitedNodes = [],
-  currentNode = -1,
-  activeNodes = [],
-  message = "",
-  shortestPath = []
+  currentStep = null,
+  nodes: propNodes = [],
+  edges: propEdges = [],
+  visitedNodes: propVisitedNodes = [],
+  currentNode: propCurrentNode = -1,
+  activeNodes: propActiveNodes = [],
+  message: propMessage = "",
+  shortestPath: propShortestPath = [],
+  isCompact = false
 }) => {
+  // Extract data from currentStep if provided, otherwise use props
+  const nodes = currentStep?.nodes || propNodes;
+  const edges = currentStep?.edges || propEdges;
+  const visitedNodes = currentStep?.visited || currentStep?.visitedNodes || propVisitedNodes;
+  const currentNode = currentStep?.current ?? currentStep?.currentNode ?? propCurrentNode;
+  const activeNodes = currentStep?.active || currentStep?.activeNodes || propActiveNodes;
+  const message = currentStep?.message || propMessage;
+  const shortestPath = currentStep?.shortestPath || propShortestPath;
+
   try {
     if (!nodes || nodes.length === 0) {
       return (
