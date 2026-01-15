@@ -7,12 +7,13 @@ import BinarySearchVisualizer from './BinarySearchVisualizer';
 import TwoPointerVisualizer from './TwoPointerVisualizer';
 import SearchVisualizer from './SearchVisualizer';
 import GraphVisualizer from './GraphVisualizer';
-import DPVisualizer from './DPVisualizer';
+import DPVisualizer from '../pages/DPVisualizer';
 import GanttChartVisualizer from './GanttChartVisualizer';
 import ChartsVisualizer from './ChartsVisualizer';
 import MergeTree from './MergeTree';
 import DijkstraVisualizer from './DijkstraVisualizer';
 import BFSVisualizer from './BFSVisualizer';
+import BucketSortVisualizer from './BucketSortVisualizer';
 
 const SmartVisualizer = ({
   algorithmType,
@@ -28,6 +29,12 @@ const SmartVisualizer = ({
       case 'sorting':
         if (stepData?.rootId) {
           return <MergeTree currentStep={stepData} />;
+        }
+        if (algorithmName === 'bucket') {
+          return <BucketSortVisualizer currentStep={stepData} />;
+        }
+        if (algorithmName === 'radix') {
+          return <RadixSortVisualizer currentStep={stepData} />;
         }
 
         // Use Block Visualizer for sorting algorithms with sorted tracking

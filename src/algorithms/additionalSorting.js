@@ -1,104 +1,4 @@
-// Additional Sorting Algorithms
-// Shell Sort, Bucket Sort, Cocktail Shaker Sort, Comb Sort, Gnome Sort, Odd-Even Sort
-
-// Shell Sort - Improved insertion sort with gap sequence
-export function getShellSortSteps(inputArr) {
-  const arr = [...inputArr];
-  const steps = [];
-  const n = arr.length;
-  const sorted = [];
-
-  steps.push({
-    array: [...arr],
-    active: [],
-    swapped: false,
-    sorted: [...sorted],
-    message: "Starting Shell Sort - an optimized insertion sort using gap sequences"
-  });
-
-  // Handle empty array explicitly for consistency with other sorting algorithms
-  if (n === 0) {
-    steps.push({
-      array: [...arr],
-      active: [],
-      swapped: false,
-      sorted: [],
-      message: "Shell Sort completed! Array is now sorted."
-    });
-    return steps;
-  }
-  
-  // Start with a big gap, then reduce
-  for (let gap = Math.floor(n / 2); gap > 0; gap = Math.floor(gap / 2)) {
-    steps.push({
-      array: [...arr],
-      active: [],
-      swapped: false,
-      sorted: [...sorted],
-      message: `Using gap size: ${gap} - elements ${gap} apart will be compared`
-    });
-
-    // Perform gapped insertion sort
-    for (let i = gap; i < n; i++) {
-      const temp = arr[i];
-      let j = i;
-
-      steps.push({
-        array: [...arr],
-        active: [i],
-        swapped: false,
-        sorted: [...sorted],
-        keyIdx: i,
-        message: `Inserting element ${temp} at index ${i} with gap ${gap}`
-      });
-
-      while (j >= gap && arr[j - gap] > temp) {
-        steps.push({
-          array: [...arr],
-          active: [j, j - gap],
-          swapped: false,
-          sorted: [...sorted],
-          message: `Comparing ${arr[j - gap]} > ${temp}`
-        });
-
-        arr[j] = arr[j - gap];
-        
-        steps.push({
-          array: [...arr],
-          active: [j, j - gap],
-          swapped: true,
-          sorted: [...sorted],
-          message: `Shifted ${arr[j]} from index ${j - gap} to ${j}`
-        });
-
-        j -= gap;
-      }
-
-      arr[j] = temp;
-      if (j !== i) {
-        steps.push({
-          array: [...arr],
-          active: [j],
-          swapped: true,
-          sorted: [...sorted],
-          message: `Placed ${temp} at index ${j}`
-        });
-      }
-    }
-  }
-
-  // Mark all as sorted
-  const allSorted = Array.from({ length: n }, (_, i) => i);
-  steps.push({
-    array: [...arr],
-    active: [],
-    swapped: false,
-    sorted: allSorted,
-    message: "Shell Sort completed! Array is now fully sorted."
-  });
-
-  return steps;
-}
+// Bucket Sort, Cocktail Shaker Sort, Comb Sort, Gnome Sort, Odd-Even Sort
 
 // Bucket Sort - Distributes elements into buckets then sorts each bucket
 export function getBucketSortSteps(inputArr) {
@@ -138,7 +38,7 @@ export function getBucketSortSteps(inputArr) {
   for (let i = 0; i < n; i++) {
     const bucketIdx = Math.min(Math.floor((arr[i] - min) / bucketSize), bucketCount - 1);
     buckets[bucketIdx].push(arr[i]);
-    
+
     steps.push({
       array: [...arr],
       active: [i],
@@ -419,7 +319,7 @@ export function getGnomeSortSteps(inputArr) {
       // Update sorted portion - elements from 0 to index are in relative order
       sorted.length = 0;
       for (let k = 0; k <= index; k++) sorted.push(k);
-      
+
       steps.push({
         array: [...arr],
         active: [],
