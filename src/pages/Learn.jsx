@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import AlgorithmSearch from '../components/AlgorithmSearch';
 import SmartVisualizer from '../components/SmartVisualizer';
 import QuickSort2D from '../components/QuickSort2D';
 import MergeTree from '../components/MergeTree';
@@ -102,6 +103,12 @@ const PlusIcon = () => (
 
 const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
 
+  const handleSearchSelect = (item) => {
+    if (item.id && item.type === 'algo') {
+      setSelectedAlgorithm(item.id);
+    }
+  };
+
   const [inputArray, setInputArray] = useState([64, 34, 25, 12, 22, 11, 90, 45, 33, 77]);
   const [speedMultiplier, setSpeedMultiplier] = useState(1);
   const [customInput, setCustomInput] = useState('64, 34, 25, 12, 22, 11, 90, 45, 33, 77');
@@ -193,14 +200,26 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8"
+          className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8"
         >
-          <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-gradient-to-br from-gray-500 to-dark-700 flex items-center justify-center text-dark-200 shadow-lg border border-white flex-shrink-0">
-            <BookIcon />
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-gradient-to-br from-gray-500 to-dark-700 flex items-center justify-center text-dark-200 shadow-lg border border-white flex-shrink-0">
+              <BookIcon />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-dark-50">Learn Algorithms</h1>
+              <p className="text-white text-xs sm:text-sm">Interactive algorithm visualization and learning</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-dark-50">Learn Algorithms</h1>
-            <p className="text-white text-xs sm:text-sm">Interactive algorithm visualization and learning</p>
+          
+          {/* Search Bar in Header */}
+          <div className="sm:ml-auto w-full sm:w-64 md:w-80">
+            <AlgorithmSearch 
+              onSelect={handleSearchSelect}
+              placeholder="Quick switch algorithm..."
+              showHint={true}
+              hintText="Instantly switch visualization"
+            />
           </div>
         </motion.div>
 

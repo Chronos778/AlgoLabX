@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import AlgorithmSearch from '../components/AlgorithmSearch';
 
 // Icon Components
 const BookOpenIcon = () => (
@@ -56,7 +57,15 @@ const CubeIcon = () => (
   </svg>
 );
 
-const Home = ({ setActiveTab }) => {
+const Home = ({ setActiveTab, onAlgorithmSelect }) => {
+  
+  const handleSearchSelect = (item) => {
+    if (item.type === 'algo' && onAlgorithmSelect) {
+      onAlgorithmSelect(item.id);
+    }
+    setActiveTab('learn');
+  };
+
   const features = [
     {
       id: 'learn',
@@ -169,6 +178,29 @@ const Home = ({ setActiveTab }) => {
                 </motion.button>
               </div>
             </div>
+          </div>
+        </motion.div>
+
+        {/* Search Bar Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-6 sm:mb-8"
+        >
+          <div className="bg-dark-800/40 backdrop-blur-xl border border-white/20 rounded-xl p-4 sm:p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <p className="text-dark-200 text-xs sm:text-sm font-medium">Quick Algorithm Search</p>
+            </div>
+            <AlgorithmSearch 
+              onSelect={handleSearchSelect}
+              placeholder="Try: 'O(n log n)', 'divide conquer', 'shortest path'..."
+              showHint={true}
+              hintText="Search by name, complexity, or description → Opens in Learn tab"
+            />
           </div>
         </motion.div>
 

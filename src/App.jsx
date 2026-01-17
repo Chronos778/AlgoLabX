@@ -16,7 +16,7 @@ function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <Home setActiveTab={setActiveTab} />;
+        return <Home setActiveTab={setActiveTab} onAlgorithmSelect={setSelectedAlgorithm} />;
       case 'learn':
         return (
           <Learn
@@ -48,10 +48,10 @@ function App() {
 
       {/* Main Layout */}
       <div className="flex h-screen relative z-10">
-        {/* Mobile Sidebar Overlay */}
+        {/* Sidebar Overlay - Always active when sidebar is open */}
         {sidebarOpen && (
           <div 
-            className="fixed inset-0 bg-black/50 lg:hidden z-40"
+            className="fixed inset-0 bg-black/50 z-40"
             tabIndex={-1}
             onClick={() => setSidebarOpen(false)}
             onKeyDown={(event) => {
@@ -62,9 +62,9 @@ function App() {
           />
         )}
         
-        {/* Sidebar - Hidden on mobile, visible on lg */}
-        <div className={`fixed lg:static inset-y-0 left-0 z-50 transform transition-transform duration-300 lg:transform-none ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        {/* Sidebar - Always hidden by default, opens on button click */}
+        <div className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}>
           <Sidebar 
             activeTab={activeTab} 
