@@ -64,10 +64,10 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
           </div>
         </motion.div>
         
-        {/* Close button for mobile */}
+        {/* Close button - Always visible */}
         <button 
           onClick={() => setSidebarOpen(false)}
-          className="lg:hidden p-2 hover:bg-dark-800 rounded-lg transition-colors"
+          className="p-2 hover:bg-dark-800 rounded-lg transition-colors"
         >
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -74,10 +74,10 @@ const Header = ({ setActiveTab, setSelectedAlgorithm, sidebarOpen, setSidebarOpe
       animate={{ opacity: 1, y: 0 }}
       className="h-14 sm:h-16 bg-dark-900/80 border-b border-white flex items-center justify-between px-3 sm:px-6 sticky top-0 z-50 backdrop-blur-xl gap-3"
     >
-      {/* Mobile Menu Button */}
+      {/* Menu Button - Always visible */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="lg:hidden p-2 hover:bg-dark-800 rounded-lg transition-colors flex-shrink-0"
+        className="p-2 hover:bg-dark-800 rounded-lg transition-colors flex-shrink-0"
       >
         <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -93,74 +93,8 @@ const Header = ({ setActiveTab, setSelectedAlgorithm, sidebarOpen, setSidebarOpe
         <span className="text-white text-xs sm:text-sm font-medium hidden sm:inline">Dashboard</span>
       </div>
 
-      {/* Center Section - Advanced Search (Hidden on small mobile) */}
-      <div className="hidden sm:block max-w-xs flex-1 px-4 relative">
-        <div className="w-full relative group">
-          <input
-            type="text"
-            placeholder="Search algorithms..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setShowSuggestions(true);
-              setSelectedIndex(-1);
-            }}
-            onFocus={() => setShowSuggestions(true)}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-            onKeyDown={handleKeyDown}
-            className="w-full bg-dark-800/50 border border-white rounded-xl py-2 pl-10 pr-4 text-dark-200 text-xs sm:text-sm placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300 group-hover:bg-dark-800/80"
-          />
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white group-hover:text-white transition-colors"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-
-        {/* Suggestions Dropdown */}
-        <AnimatePresence>
-          {showSuggestions && filteredSuggestions.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute top-full left-2 right-2 mt-2 bg-dark-900 border border-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-[100] backdrop-blur-2xl"
-            >
-              {filteredSuggestions.map((item, index) => (
-                <button
-                  key={`${item.id}-${index}`}
-                  onClick={() => handleSelect(item)}
-                  onMouseEnter={() => setSelectedIndex(index)}
-                  className={`w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 text-left transition-all text-xs sm:text-sm ${selectedIndex === index
-                    ? 'bg-dark-800/80 text-dark-50'
-                    : 'text-white hover:bg-dark-800/40'
-                    }`}
-                >
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-medium truncate">{item.label}</span>
-                    <span className="text-[9px] sm:text-[10px] text-white uppercase tracking-wider">{item.category}</span>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                    {item.type === 'algo' ? (
-                      <span className="px-1.5 py-0.5 rounded-md bg-dark-800 text-[9px] sm:text-[10px] text-white border border-dark-700/30 whitespace-nowrap">
-                        Algo<span className="hidden sm:inline">rithm</span>
-                      </span>
-                    ) : (
-                      <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-[9px] sm:text-[10px] text-emerald-400 border border-emerald-500/20 whitespace-nowrap">Page</span>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
       {/* Right Section - Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 ml-auto">
         <motion.a
           href="https://github.com/satyam2006-cmd/AlgoLabX"
           target="_blank"

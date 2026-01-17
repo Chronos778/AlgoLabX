@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Editor from '@monaco-editor/react';
+import AlgorithmSearch from '../components/AlgorithmSearch';
 import ArrayVisualizer from '../components/ArrayVisualizer';
 import { runPythonCode, loadPyodide } from '../engine/pyodideRunner';
 
@@ -181,10 +182,12 @@ const Experiment = () => {
     setInput(randomArray.join(', '));
   };
 
-  const handleLoadExample = (example) => {
-    const examples = {
-      bubble: `def solve(arr):
-    """Bubble Sort implementation"""
+  // Comprehensive algorithm templates
+  const algorithmTemplates = {
+    bubble: `def solve(arr):
+    """Bubble Sort - O(n²)
+    Compare adjacent elements and swap if out of order
+    """
     for i in range(len(arr)):
         step()
         for j in range(0, len(arr) - i - 1):
@@ -193,8 +196,41 @@ const Experiment = () => {
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
                 record(arr)
     return arr`,
-      merge: `def solve(arr):
-    """Merge Sort implementation"""
+    selection: `def solve(arr):
+    """Selection Sort - O(n²)
+    Find minimum and place at beginning
+    """
+    n = len(arr)
+    for i in range(n):
+        min_idx = i
+        step()
+        for j in range(i + 1, n):
+            step()
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+        record(arr)
+    return arr`,
+    insertion: `def solve(arr):
+    """Insertion Sort - O(n²)
+    Build sorted array one element at a time
+    """
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        step()
+        while j >= 0 and arr[j] > key:
+            step()
+            arr[j + 1] = arr[j]
+            j -= 1
+            record(arr)
+        arr[j + 1] = key
+        record(arr)
+    return arr`,
+    merge: `def solve(arr):
+    """Merge Sort - O(n log n)
+    Divide and conquer, merge sorted halves
+    """
     def merge_sort(arr):
         if len(arr) <= 1:
             return arr
@@ -219,8 +255,10 @@ const Experiment = () => {
         result.extend(right[j:])
         return result
     return merge_sort(arr)`,
-      quick: `def solve(arr):
-    """Quick Sort implementation"""
+    quick: `def solve(arr):
+    """Quick Sort - O(n log n)
+    Partition around pivot element
+    """
     def quicksort(arr, low, high):
         if low < high:
             pi = partition(arr, low, high)
@@ -240,9 +278,107 @@ const Experiment = () => {
         record(arr)
         return i + 1
     quicksort(arr, 0, len(arr) - 1)
-    return arr`
-    };
-    setCode(examples[example]);
+    return arr`,
+    heap: `def solve(arr):
+    """Heap Sort - O(n log n)
+    Uses binary heap data structure
+    """
+    def heapify(arr, n, i):
+        largest = i
+        left = 2 * i + 1
+        right = 2 * i + 2
+        step()
+        if left < n and arr[left] > arr[largest]:
+            largest = left
+        if right < n and arr[right] > arr[largest]:
+            largest = right
+        if largest != i:
+            arr[i], arr[largest] = arr[largest], arr[i]
+            record(arr)
+            heapify(arr, n, largest)
+    n = len(arr)
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+    for i in range(n - 1, 0, -1):
+        arr[0], arr[i] = arr[i], arr[0]
+        record(arr)
+        heapify(arr, i, 0)
+    return arr`,
+    binary: `def solve(arr):
+    """Binary Search - O(log n)
+    Divide sorted array in half each step
+    Target is the last element in input
+    """
+    target = arr[-1]
+    arr = sorted(arr[:-1])
+    record(arr)
+    left, right = 0, len(arr) - 1
+    while left <= right:
+        step()
+        mid = (left + right) // 2
+        record([mid])  # Record current search position
+        if arr[mid] == target:
+            return [mid]  # Found at index mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return [-1]  # Not found`,
+    linear: `def solve(arr):
+    """Linear Search - O(n)
+    Check each element sequentially
+    Target is the last element in input
+    """
+    target = arr[-1]
+    arr = arr[:-1]
+    record(arr)
+    for i in range(len(arr)):
+        step()
+        record([i])  # Record current position
+        if arr[i] == target:
+            return [i]  # Found at index i
+    return [-1]  # Not found`,
+    fibonacci: `def solve(arr):
+    """Fibonacci DP - O(n)
+    Computing Fibonacci using dynamic programming
+    First element is n (which Fibonacci to compute)
+    """
+    n = arr[0] if arr else 10
+    if n <= 0:
+        return [0]
+    dp = [0] * (n + 1)
+    dp[1] = 1
+    record(dp[:2])
+    for i in range(2, n + 1):
+        step()
+        dp[i] = dp[i-1] + dp[i-2]
+        record(dp[:i+1])
+    return dp`,
+    counting: `def solve(arr):
+    """Counting Sort - O(n + k)
+    Count occurrences of each element
+    """
+    if not arr:
+        return arr
+    max_val = max(arr)
+    count = [0] * (max_val + 1)
+    for num in arr:
+        step()
+        count[num] += 1
+        record(count)
+    result = []
+    for i, c in enumerate(count):
+        step()
+        result.extend([i] * c)
+        if c > 0:
+            record(result)
+    return result`
+  };
+
+  const handleLoadExample = (example) => {
+    if (algorithmTemplates[example]) {
+      setCode(algorithmTemplates[example]);
+    }
   };
 
   useEffect(() => {
@@ -285,17 +421,70 @@ const Experiment = () => {
 
   const currentVisualizationState = result?.states?.[currentVisualizationIndex] || (result?.output ? result.output : []);
 
+  // Smart search handler - loads algorithm templates with feedback
+  const handleSearchSelect = (item) => {
+    // Map algorithm IDs to available templates
+    const templateMapping = {
+      bubble: 'bubble',
+      selection: 'selection',
+      insertion: 'insertion',
+      merge: 'merge',
+      quick: 'quick',
+      heap: 'heap',
+      binary: 'binary',
+      linear: 'linear',
+      fibonacci: 'fibonacci',
+      fibonaccidp: 'fibonacci',
+      counting: 'counting',
+    };
+    
+    const templateKey = templateMapping[item.id];
+    if (templateKey && algorithmTemplates[templateKey]) {
+      handleLoadExample(templateKey);
+      // Clear any previous results when loading new template
+      setResult(null);
+      setError(null);
+    }
+  };
+
+  // Custom algorithms for experiment - only show ones with templates
+  const experimentAlgorithms = [
+    { id: 'bubble', label: 'Bubble Sort', category: 'Sorting', type: 'algo', complexity: 'O(n²)', description: 'Compare adjacent elements and swap' },
+    { id: 'selection', label: 'Selection Sort', category: 'Sorting', type: 'algo', complexity: 'O(n²)', description: 'Find minimum and place at beginning' },
+    { id: 'insertion', label: 'Insertion Sort', category: 'Sorting', type: 'algo', complexity: 'O(n²)', description: 'Build sorted array one element at a time' },
+    { id: 'merge', label: 'Merge Sort', category: 'Sorting', type: 'algo', complexity: 'O(n log n)', description: 'Divide and conquer with merge' },
+    { id: 'quick', label: 'Quick Sort', category: 'Sorting', type: 'algo', complexity: 'O(n log n)', description: 'Partition around pivot' },
+    { id: 'heap', label: 'Heap Sort', category: 'Sorting', type: 'algo', complexity: 'O(n log n)', description: 'Uses binary heap structure' },
+    { id: 'counting', label: 'Counting Sort', category: 'Sorting', type: 'algo', complexity: 'O(n + k)', description: 'Count element occurrences' },
+    { id: 'binary', label: 'Binary Search', category: 'Searching', type: 'algo', complexity: 'O(log n)', description: 'Divide array in half' },
+    { id: 'linear', label: 'Linear Search', category: 'Searching', type: 'algo', complexity: 'O(n)', description: 'Check each element' },
+    { id: 'fibonacci', label: 'Fibonacci DP', category: 'DP', type: 'algo', complexity: 'O(n)', description: 'Fibonacci with memoization' },
+  ];
+
   return (
-    <div className="flex-1 p-8">
+    <div className="flex-1 p-3 sm:p-6 md:p-8 overflow-y-auto">
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-dark-800 flex items-center justify-center text-white shadow-lg border border-white/20">
-            <BeakerIcon />
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-gradient-to-br from-purple-600 to-dark-800 flex items-center justify-center text-white shadow-lg border border-white/20 flex-shrink-0">
+              <BeakerIcon />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-dark-50">Experiment Lab</h1>
+              <p className="text-white text-xs sm:text-sm">Write and test your own algorithms with Python</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-dark-50">Experiment Lab</h1>
-            <p className="text-white text-sm">Write and test your own algorithms with Python</p>
+          
+          {/* Search Bar in Header */}
+          <div className="sm:ml-auto w-full sm:w-64 md:w-80">
+            <AlgorithmSearch 
+              onSelect={handleSearchSelect}
+              algorithms={experimentAlgorithms}
+              placeholder="Load algorithm template..."
+              showHint={true}
+              hintText="Loads Python code template into editor"
+            />
           </div>
         </motion.div>
 
@@ -318,9 +507,22 @@ const Experiment = () => {
                   </h3>
                   <select onChange={(e) => handleLoadExample(e.target.value)} className="px-4 py-2 bg-dark-900/60 border border-white rounded-xl text-dark-200 text-sm focus:outline-none" defaultValue="">
                     <option value="" disabled>Load Example</option>
-                    <option value="bubble">Bubble Sort</option>
-                    <option value="merge">Merge Sort</option>
-                    <option value="quick">Quick Sort</option>
+                    <optgroup label="Sorting">
+                      <option value="bubble">Bubble Sort</option>
+                      <option value="selection">Selection Sort</option>
+                      <option value="insertion">Insertion Sort</option>
+                      <option value="merge">Merge Sort</option>
+                      <option value="quick">Quick Sort</option>
+                      <option value="heap">Heap Sort</option>
+                      <option value="counting">Counting Sort</option>
+                    </optgroup>
+                    <optgroup label="Searching">
+                      <option value="binary">Binary Search</option>
+                      <option value="linear">Linear Search</option>
+                    </optgroup>
+                    <optgroup label="Dynamic Programming">
+                      <option value="fibonacci">Fibonacci DP</option>
+                    </optgroup>
                   </select>
                 </div>
               </div>

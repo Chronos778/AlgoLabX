@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import AlgorithmSearch from '../components/AlgorithmSearch';
 import SmartVisualizer from '../components/SmartVisualizer';
 import HeapSortVisualizer from '../components/HeapSortVisualizer';
 import QuickSortVisualizer from '../components/QuickSort3D'; // 2D Tile Implementation
@@ -86,6 +87,20 @@ const Compare = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [searchTarget, setSearchTarget] = useState('45');
   const [customInput, setCustomInput] = useState('64, 34, 25, 12, 22, 11, 90, 45, 33, 77');
+  const [activeSearchSlot, setActiveSearchSlot] = useState(1); // Start with slot 1
+
+  // Smart search handler - auto-alternates between slots
+  const handleSearchSelect = (item) => {
+    if (item.id && item.type === 'algo') {
+      if (activeSearchSlot === 2) {
+        setAlgo2(item.id);
+        setActiveSearchSlot(1); // Auto-switch to slot 1 after filling slot 2
+      } else {
+        setAlgo1(item.id);
+        setActiveSearchSlot(2); // Auto-switch to slot 2 after filling slot 1
+      }
+    }
+  };
 
   const speedOptions = [0.5, 1, 1.5, 2, 3];
   const baseSpeed = 1000;
@@ -167,16 +182,53 @@ const Compare = () => {
   useEffect(() => { handleReset(); }, [algo1, algo2, inputArray]);
 
   return (
-    <div className="flex-1 p-8">
+    <div className="flex-1 p-3 sm:p-6 md:p-8 overflow-y-auto">
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-dark-700 flex items-center justify-center text-dark-200 shadow-lg border border-dark-500/30">
-            <ScaleIcon />
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-xl bg-gradient-to-br from-green-500 to-dark-700 flex items-center justify-center text-dark-200 shadow-lg border border-dark-500/30 flex-shrink-0">
+              <ScaleIcon />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-dark-50">Compare Algorithms</h1>
+              <p className="text-white text-xs sm:text-sm">Side-by-side algorithm performance analysis</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-dark-50">Compare Algorithms</h1>
-            <p className="text-white text-sm">Side-by-side algorithm performance analysis</p>
+          
+          {/* Search Bar in Header */}
+          <div className="sm:ml-auto w-full sm:w-64 md:w-80">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-dark-500 text-xs">Fill:</span>
+              <button
+                onClick={() => setActiveSearchSlot(1)}
+                className={`text-xs px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
+                  activeSearchSlot === 1 
+                    ? 'bg-blue-500/30 text-blue-400 border border-blue-500/40' 
+                    : 'bg-dark-700/50 text-dark-400 hover:bg-dark-700 border border-transparent'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                Slot 1
+              </button>
+              <button
+                onClick={() => setActiveSearchSlot(2)}
+                className={`text-xs px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
+                  activeSearchSlot === 2 
+                    ? 'bg-purple-500/30 text-purple-400 border border-purple-500/40' 
+                    : 'bg-dark-700/50 text-dark-400 hover:bg-dark-700 border border-transparent'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                Slot 2
+              </button>
+            </div>
+            <AlgorithmSearch 
+              onSelect={handleSearchSelect}
+              placeholder={activeSearchSlot === 2 ? "Search for Algo 2..." : "Search for Algo 1..."}
+              showHint={true}
+              hintText={`Selected: ${activeSearchSlot === 2 ? algorithms[algo2]?.name : algorithms[algo1]?.name}`}
+            />
           </div>
         </motion.div>
 
