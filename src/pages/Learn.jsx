@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import AlgorithmSearch from '../components/AlgorithmSearch';
 import SmartVisualizer from '../components/SmartVisualizer';
 import QuickSort2D from '../components/QuickSort2D';
 import MergeTree from '../components/MergeTree';
@@ -114,12 +113,6 @@ const LoadingPlaceholder = () => (
 );
 
 const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
-
-  const handleSearchSelect = (item) => {
-    if (item.id && item.type === 'algo') {
-      setSelectedAlgorithm(item.id);
-    }
-  };
 
   const [inputArray, setInputArray] = useState([64, 34, 25, 12, 22, 11, 90, 45, 33, 77]);
   const [speedMultiplier, setSpeedMultiplier] = useState(1);
@@ -296,16 +289,6 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
               <h1 className="text-xl sm:text-2xl font-bold text-dark-50">Learn Algorithms</h1>
               <p className="text-white text-xs sm:text-sm">Interactive algorithm visualization and learning</p>
             </div>
-          </div>
-          
-          {/* Search Bar in Header */}
-          <div className="sm:ml-auto w-full sm:w-64 md:w-80">
-            <AlgorithmSearch 
-              onSelect={handleSearchSelect}
-              placeholder="Quick switch algorithm..."
-              showHint={true}
-              hintText="Instantly switch visualization"
-            />
           </div>
         </motion.div>
 

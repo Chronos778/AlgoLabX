@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Editor from '@monaco-editor/react';
-import AlgorithmSearch from '../components/AlgorithmSearch';
 import ArrayVisualizer from '../components/ArrayVisualizer';
 import { runPythonCode, loadPyodide } from '../engine/pyodideRunner';
 
@@ -421,46 +420,6 @@ const Experiment = () => {
 
   const currentVisualizationState = result?.states?.[currentVisualizationIndex] || (result?.output ? result.output : []);
 
-  // Smart search handler - loads algorithm templates with feedback
-  const handleSearchSelect = (item) => {
-    // Map algorithm IDs to available templates
-    const templateMapping = {
-      bubble: 'bubble',
-      selection: 'selection',
-      insertion: 'insertion',
-      merge: 'merge',
-      quick: 'quick',
-      heap: 'heap',
-      binary: 'binary',
-      linear: 'linear',
-      fibonacci: 'fibonacci',
-      fibonaccidp: 'fibonacci',
-      counting: 'counting',
-    };
-    
-    const templateKey = templateMapping[item.id];
-    if (templateKey && algorithmTemplates[templateKey]) {
-      handleLoadExample(templateKey);
-      // Clear any previous results when loading new template
-      setResult(null);
-      setError(null);
-    }
-  };
-
-  // Custom algorithms for experiment - only show ones with templates
-  const experimentAlgorithms = [
-    { id: 'bubble', label: 'Bubble Sort', category: 'Sorting', type: 'algo', complexity: 'O(n²)', description: 'Compare adjacent elements and swap' },
-    { id: 'selection', label: 'Selection Sort', category: 'Sorting', type: 'algo', complexity: 'O(n²)', description: 'Find minimum and place at beginning' },
-    { id: 'insertion', label: 'Insertion Sort', category: 'Sorting', type: 'algo', complexity: 'O(n²)', description: 'Build sorted array one element at a time' },
-    { id: 'merge', label: 'Merge Sort', category: 'Sorting', type: 'algo', complexity: 'O(n log n)', description: 'Divide and conquer with merge' },
-    { id: 'quick', label: 'Quick Sort', category: 'Sorting', type: 'algo', complexity: 'O(n log n)', description: 'Partition around pivot' },
-    { id: 'heap', label: 'Heap Sort', category: 'Sorting', type: 'algo', complexity: 'O(n log n)', description: 'Uses binary heap structure' },
-    { id: 'counting', label: 'Counting Sort', category: 'Sorting', type: 'algo', complexity: 'O(n + k)', description: 'Count element occurrences' },
-    { id: 'binary', label: 'Binary Search', category: 'Searching', type: 'algo', complexity: 'O(log n)', description: 'Divide array in half' },
-    { id: 'linear', label: 'Linear Search', category: 'Searching', type: 'algo', complexity: 'O(n)', description: 'Check each element' },
-    { id: 'fibonacci', label: 'Fibonacci DP', category: 'DP', type: 'algo', complexity: 'O(n)', description: 'Fibonacci with memoization' },
-  ];
-
   return (
     <div className="flex-1 p-3 sm:p-6 md:p-8 overflow-y-auto">
       <div className="max-w-7xl mx-auto">
@@ -474,17 +433,6 @@ const Experiment = () => {
               <h1 className="text-xl sm:text-2xl font-bold text-dark-50">Experiment Lab</h1>
               <p className="text-white text-xs sm:text-sm">Write and test your own algorithms with Python</p>
             </div>
-          </div>
-          
-          {/* Search Bar in Header */}
-          <div className="sm:ml-auto w-full sm:w-64 md:w-80">
-            <AlgorithmSearch 
-              onSelect={handleSearchSelect}
-              algorithms={experimentAlgorithms}
-              placeholder="Load algorithm template..."
-              showHint={true}
-              hintText="Loads Python code template into editor"
-            />
           </div>
         </motion.div>
 
