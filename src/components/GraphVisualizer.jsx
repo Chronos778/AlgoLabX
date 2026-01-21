@@ -31,13 +31,14 @@ const GraphVisualizer = ({
     }
 
     // Calculate node positions in a grid layout instead of circular
-    const calculateNodePositions = (nodeCount) => {
+    const calculateNodePositions = (nodeList) => {
       const positions = [];
+      const nodeCount = nodeList.length;
       const cols = Math.ceil(Math.sqrt(nodeCount));
       const rows = Math.ceil(nodeCount / cols);
-      
+
       // Responsive spacing based on window size
-      const isMobile = window.innerWidth < 640;
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
       const spacing = isMobile ? 50 : 80;
       const startX = isMobile ? 30 : 50;
       const startY = isMobile ? 30 : 50;
@@ -48,7 +49,7 @@ const GraphVisualizer = ({
           positions.push({
             x: startX + col * spacing,
             y: startY + row * spacing,
-            id: index
+            id: nodeList[index].id // Correctly map the ID from the node object
           });
           index++;
         }
@@ -56,7 +57,7 @@ const GraphVisualizer = ({
       return positions;
     };
 
-    const nodePositions = calculateNodePositions(nodes.length);
+    const nodePositions = calculateNodePositions(nodes);
 
     const getEdgeColor = (edge, visitedNodes, activeNodes, shortestPath = []) => {
       // Check if this edge is part of the shortest path
@@ -66,10 +67,10 @@ const GraphVisualizer = ({
           (edge.to === node && edge.from === shortestPath[index + 1]))
       );
 
-      if (isInShortestPath) return '#366346ff'; // Dark Green for shortest path
-      if (activeNodes.includes(edge.from) || activeNodes.includes(edge.to)) return '#7bcbe9ff'; // Pale Blue for active
-      if (visitedNodes.includes(edge.from) && visitedNodes.includes(edge.to)) return '#36634688'; // Muted green visited
-      return '#2a2a32'; // Unvisited
+      if (isInShortestPath) return '#00ff88'; // Neon Green for shortest path
+      if (activeNodes.includes(edge.from) || activeNodes.includes(edge.to)) return '#00ffff'; // Neon Cyan for active
+      if (visitedNodes.includes(edge.from) && visitedNodes.includes(edge.to)) return '#ffffff33'; // White low opacity for visited
+      return '#ffffff11'; // Very faint for unvisited
     };
 
     const getEdgeWidth = (edge, visitedNodes, activeNodes, shortestPath = []) => {
@@ -81,14 +82,21 @@ const GraphVisualizer = ({
 
       if (isInShortestPath) return 4;
       if (activeNodes.includes(edge.from) || activeNodes.includes(edge.to)) return 3;
-      return 2;
+      return 1;
     };
 
     const getNodeColor = (nodeId) => {
-      if (currentNode === nodeId) return '#7bcbe9ff'; // Pale Blue for current
-      if (visitedNodes.includes(nodeId)) return '#366346ff'; // Dark Green for visited
-      if (activeNodes.includes(nodeId)) return '#7bcbe988'; // Muted blue for active
-      return '#2a2a32'; // Dark gray/border color for unvisited
+      if (currentNode === nodeId) return '#00ffff'; // Cyan for current
+      if (visitedNodes.includes(nodeId)) return '#00ff88'; // Green for visited
+      if (activeNodes.includes(nodeId)) return '#00ffff88'; // Muted cyan for active
+      return '#1a1a1f'; // Dark background for unvisited
+    };
+
+    const getNodeStroke = (nodeId) => {
+      if (currentNode === nodeId) return '#00ffff';
+      if (visitedNodes.includes(nodeId)) return '#00ff88';
+      if (activeNodes.includes(nodeId)) return '#00ffff';
+      return '#ffffff33';
     };
 
     const getNodeSize = (nodeId) => {
@@ -98,10 +106,17 @@ const GraphVisualizer = ({
     };
 
     return (
-      <div className="flex flex-col items-center space-y-4 p-3 sm:p-6 bg-black/40 rounded-xl backdrop-blur-sm border border-white overflow-x-auto w-full">
+      <div className="w-full bg-[#050505] rounded-[2.5rem] border border-white overflow-hidden shadow-2xl p-8 relative flex flex-col items-center justify-center min-h-[400px]">
+        {/* Cinematic Overlay */}
+        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
+
         {/* SVG Graph - Responsive sizing */}
-        <div className="w-full overflow-x-auto flex justify-center">
-          <svg width={Math.max(300, Math.min(600, window.innerWidth - 100))} height="350" className="border border-white/20 rounded-lg bg-dark-950/50 flex-shrink-0">
+        <div className="w-full h-full flex justify-center items-center relative z-10 min-h-[400px]">
+          <svg
+            viewBox={`0 0 ${Math.max(600, nodePositions.reduce((max, n) => Math.max(max, n.x + 50), 0))} 400`}
+            className="w-full h-full max-h-[500px] border-white/5 bg-white/5 rounded-2xl"
+            preserveAspectRatio="xMidYMid meet"
+          >
             {/* Edges */}
             {edges && edges.map((edge, index) => {
               try {
@@ -114,7 +129,7 @@ const GraphVisualizer = ({
                 const edgeWidth = getEdgeWidth(edge, visitedNodes, activeNodes);
 
                 return (
-                  <g key={index}>
+                  <g key={`edge-${index}`}>
                     <motion.line
                       x1={fromNode.x}
                       y1={fromNode.y}
@@ -127,23 +142,33 @@ const GraphVisualizer = ({
                       transition={{ duration: 0.3 }}
                     />
                     {/* Edge label for weight/distance */}
-                    <motion.text
-                      x={(fromNode.x + toNode.x) / 2}
-                      y={(fromNode.y + toNode.y) / 2 - 5}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      fill="#9ca3af"
-                      fontSize="9"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3, delay: 0.1 }}
-                    >
-                      {edge.label || edge.weight || ''}
-                    </motion.text>
+                    {(edge.label || edge.weight) && (
+                      <g>
+                        <circle
+                          cx={(fromNode.x + toNode.x) / 2}
+                          cy={(fromNode.y + toNode.y) / 2}
+                          r="8"
+                          fill="#111827"
+                        />
+                        <motion.text
+                          x={(fromNode.x + toNode.x) / 2}
+                          y={(fromNode.y + toNode.y) / 2}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          fill="#9ca3af"
+                          fontSize="10"
+                          fontWeight="bold"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.3, delay: 0.1 }}
+                        >
+                          {edge.label || edge.weight}
+                        </motion.text>
+                      </g>
+                    )}
                   </g>
                 );
               } catch (error) {
-                console.error('Error rendering edge:', error);
                 return null;
               }
             })}
@@ -161,45 +186,47 @@ const GraphVisualizer = ({
                       cy={position.y}
                       r={getNodeSize(index)}
                       fill={getNodeColor(index)}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  <motion.text
-                    x={position.x}
-                    y={position.y}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="white"
-                    fontSize="12"
-                    fontWeight="bold"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3, delay: 0.2 }}
-                  >
-                    {node.label || `N${index}`}
-                  </motion.text>
-                  <motion.text
-                    x={position.x}
-                    y={position.y + 20}
-                    textAnchor="middle"
-                    dominantBaseline="top"
-                    fill="#9ca3af"
-                    fontSize="10"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3, delay: 0.3 }}
-                  >
-                    {node.value}
-                  </motion.text>
-                </g>
-              );
-            } catch (error) {
-              console.error('Error rendering node:', error);
-              return null;
-            }
-          })}
-        </svg>
+                      stroke={getNodeStroke(index)}
+                      strokeWidth={2}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    <motion.text
+                      x={position.x}
+                      y={position.y}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fill="white"
+                      fontSize="12"
+                      fontWeight="bold"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                    >
+                      {node.label || `N${index}`}
+                    </motion.text>
+                    <motion.text
+                      x={position.x}
+                      y={position.y + 20}
+                      textAnchor="middle"
+                      dominantBaseline="top"
+                      fill="#9ca3af"
+                      fontSize="10"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3, delay: 0.3 }}
+                    >
+                      {node.value}
+                    </motion.text>
+                  </g>
+                );
+              } catch (error) {
+                console.error('Error rendering node:', error);
+                return null;
+              }
+            })}
+          </svg>
         </div>
 
         {/* Message */}

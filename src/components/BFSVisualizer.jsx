@@ -19,10 +19,10 @@ const BFSVisualizer = ({
     // Premium styling constants
     const colors = {
         idle: '#2a2a32',
-        visited: '#22c55e', // Green
-        current: '#facc15', // Yellow
-        inQueue: '#f97316', // Orange
-        activeEdge: '#3b82f6', // Blue
+        visited: '#00ff88', // Neon Green
+        current: '#ffff00', // Neon Yellow
+        inQueue: '#ff00ff', // Neon Pink
+        activeEdge: '#00ffff', // Neon Cyan
         text: '#ffffff',
         mutedText: 'rgba(255, 255, 255, 0.4)'
     };
@@ -31,7 +31,9 @@ const BFSVisualizer = ({
         <div className={`flex flex-col lg:flex-row items-stretch w-full h-full min-h-[500px] gap-8 p-4 ${className}`}>
 
             {/* Left: Graph Visualization */}
-            <div className="flex-[2] relative bg-black/40 rounded-[2rem] border border-white/10 overflow-hidden backdrop-blur-md flex items-center justify-center p-4">
+            <div className="flex-[2] relative bg-[#050505] rounded-[2rem] border border-white overflow-hidden shadow-2xl flex items-center justify-center p-4">
+                {/* Cinematic Overlay */}
+                <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
                 <svg viewBox="0 0 500 400" className="w-full h-full max-h-[500px]">
                     <defs>
                         <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -135,12 +137,14 @@ const BFSVisualizer = ({
             </div>
 
             {/* Right: Queue Panel */}
-            <div className="flex-1 bg-black/40 rounded-[2rem] border border-white/10 p-6 flex flex-col backdrop-blur-md">
-                <div className="flex items-center justify-between mb-6">
+            <div className="flex-1 bg-[#050505] rounded-[2rem] border border-white p-6 flex flex-col shadow-2xl relative overflow-hidden">
+                {/* Cinematic Overlay */}
+                <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] z-0" />
+                <div className="relative z-10 flex items-center justify-between mb-6">
                     <h3 className="text-white/60 text-xs font-bold uppercase tracking-[0.3em]">BFS Queue</h3>
                     <div className="flex gap-2">
-                        <div className="w-2 h-2 rounded-full bg-yellow-400" />
-                        <div className="w-2 h-2 rounded-full bg-orange-500" />
+                        <div className="w-2 h-2 rounded-full bg-[#ffff00]" />
+                        <div className="w-2 h-2 rounded-full bg-[#ff00ff]" />
                     </div>
                 </div>
 
@@ -159,13 +163,13 @@ const BFSVisualizer = ({
                                     initial={{ x: -20, opacity: 0 }}
                                     animate={{ x: 0, opacity: 1 }}
                                     exit={{ x: 20, opacity: 0 }}
-                                    className="flex items-center gap-4 px-5 py-4 rounded-xl border border-yellow-400/30 bg-yellow-400/10 mb-4"
+                                    className="flex items-center gap-4 px-5 py-4 rounded-xl border border-[#ffff00]/30 bg-[#ffff00]/10 mb-4"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-yellow-400 flex items-center justify-center font-black text-black">
+                                    <div className="w-10 h-10 rounded-lg bg-[#ffff00] flex items-center justify-center font-black text-black">
                                         {nodes.find(n => n.id === current)?.label}
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] text-yellow-400/60 font-black uppercase tracking-widest">Processing</span>
+                                        <span className="text-[10px] text-[#ffff00]/60 font-black uppercase tracking-widest">Processing</span>
                                         <span className="text-white font-bold">Current Node</span>
                                     </div>
                                 </motion.div>
@@ -181,7 +185,7 @@ const BFSVisualizer = ({
                                     exit={{ scale: 0.8, opacity: 0 }}
                                     className="flex items-center gap-4 px-5 py-3 rounded-xl border border-white/5 bg-white/5"
                                 >
-                                    <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center font-black text-orange-400 text-sm">
+                                    <div className="w-8 h-8 rounded-lg bg-[#ff00ff]/20 flex items-center justify-center font-black text-[#ff00ff] text-sm">
                                         {nodes.find(n => n.id === nodeId)?.label}
                                     </div>
                                     <div className="flex flex-col">

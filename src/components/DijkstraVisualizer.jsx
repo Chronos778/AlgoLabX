@@ -21,11 +21,11 @@ const DijkstraVisualizer = ({
     // Premium styling constants
     const colors = {
         idle: '#2a2a32',
-        visited: '#22c55e', // Green
-        current: '#facc15', // Yellow
-        checking: '#3b82f6', // Blue
-        updating: '#a855f7', // Purple
-        path: '#22c55e',
+        visited: '#00ff88', // Green
+        current: '#ffff00', // Yellow
+        checking: '#00ffff', // Blue -> Cyan
+        updating: '#ff00ff', // Purple -> Pink
+        path: '#00ff88',
         text: '#ffffff',
         mutedText: 'rgba(255, 255, 255, 0.4)'
     };
@@ -46,7 +46,9 @@ const DijkstraVisualizer = ({
         <div className={`flex flex-col lg:flex-row items-stretch w-full h-full min-h-[500px] gap-8 p-4 ${className}`}>
 
             {/* Left: Graph Visualization */}
-            <div className="flex-[2] relative bg-black/40 rounded-[2rem] border border-white/10 overflow-hidden backdrop-blur-md flex items-center justify-center p-4">
+            <div className="flex-[2] relative bg-[#050505] rounded-[2rem] border border-white overflow-hidden shadow-2xl flex items-center justify-center p-4">
+                {/* Cinematic Overlay */}
+                <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
                 <svg viewBox="0 0 500 400" className="w-full h-full max-h-[500px]">
                     <defs>
                         <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -204,37 +206,49 @@ const DijkstraVisualizer = ({
             </div>
 
             {/* Right: Distance Table */}
-            <div className="flex-1 bg-black/40 rounded-[2rem] border border-white/10 p-6 flex flex-col backdrop-blur-md">
-                <div className="flex items-center justify-between mb-6">
+            <div className="flex-1 bg-[#050505] rounded-[2rem] border border-white p-6 flex flex-col shadow-2xl relative overflow-hidden">
+                {/* Cinematic Overlay */}
+                <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] z-0" />
+                <div className="relative z-10 flex items-center justify-between mb-6">
                     <h3 className="text-white/60 text-xs font-bold uppercase tracking-[0.3em]">Distance Table</h3>
                     <div className="flex gap-2">
-                        <div className="w-2 h-2 rounded-full bg-yellow-400" />
-                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                        <div className="w-2 h-2 rounded-full bg-[#ffff00]" />
+                        <div className="w-2 h-2 rounded-full bg-[#00ff88]" />
                     </div>
                 </div>
 
-                <div className="space-y-3 overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-3 overflow-y-auto pr-2 custom-scrollbar relative z-10">
                     {nodes.map((node) => {
                         const dist = distances[node.id];
                         const isVisited = visited.includes(node.id);
                         const isCurrent = current === node.id;
                         const isUpdating = updating === node.id;
 
+                        // Dynamic styles based on state
+                        let rowStyle = "bg-white/5 border-white/5";
+                        let badgeStyle = "bg-white/10 text-white/40";
+                        let textStyle = "text-white";
+
+                        if (isCurrent) {
+                            rowStyle = "bg-[#ffff00]/10 border-[#ffff00]/30";
+                            badgeStyle = "bg-[#ffff00] text-black";
+                        } else if (isUpdating) {
+                            rowStyle = "bg-[#ff00ff]/10 border-[#ff00ff]/30";
+                            badgeStyle = "bg-[#ff00ff]/20 text-[#ff00ff]";
+                            textStyle = "text-[#ff00ff]";
+                        } else if (isVisited) {
+                            rowStyle = "bg-[#00ff88]/5 border-[#00ff88]/20 opacity-60";
+                            badgeStyle = "bg-[#00ff88]/20 text-[#00ff88]";
+                        }
+
                         return (
                             <motion.div
                                 key={`table-row-${node.id}`}
                                 layout
-                                className={`flex items-center justify-between px-5 py-3 rounded-xl border transition-all duration-300 ${isCurrent ? 'bg-yellow-400/10 border-yellow-400/30' :
-                                        isUpdating ? 'bg-purple-500/10 border-purple-500/30' :
-                                            isVisited ? 'bg-green-500/5 border-green-500/20 opacity-60' :
-                                                'bg-white/5 border-white/5'
-                                    }`}
+                                className={`flex items-center justify-between px-5 py-3 rounded-xl border transition-all duration-300 ${rowStyle}`}
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm ${isCurrent ? 'bg-yellow-400 text-black' :
-                                            isVisited ? 'bg-green-500/20 text-green-400' :
-                                                'bg-white/10 text-white/40'
-                                        }`}>
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm ${badgeStyle}`}>
                                         {node.label}
                                     </div>
                                     <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Node {node.id}</span>
@@ -245,10 +259,7 @@ const DijkstraVisualizer = ({
                                         key={dist}
                                         initial={{ scale: 0.8, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
-                                        className={`text-xl font-black ${dist === Infinity ? 'text-white/10' :
-                                                isUpdating ? 'text-purple-400' :
-                                                    'text-white'
-                                            }`}
+                                        className={`text-xl font-black ${dist === Infinity ? 'text-white/10' : textStyle}`}
                                     >
                                         {dist === Infinity ? '∞' : dist}
                                     </motion.div>
@@ -259,21 +270,21 @@ const DijkstraVisualizer = ({
                 </div>
 
                 {/* Legend/Info */}
-                <div className="mt-auto pt-6 border-t border-white/5 grid grid-cols-2 gap-4">
+                <div className="mt-auto pt-6 border-t border-white/5 grid grid-cols-2 gap-4 relative z-10">
                     <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#ffff00]" />
                         <span className="text-[10px] text-white/30 uppercase font-bold">Current</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#00ff88]" />
                         <span className="text-[10px] text-white/30 uppercase font-bold">Visited</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#00ffff]" />
                         <span className="text-[10px] text-white/30 uppercase font-bold">Relieving</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#ff00ff]" />
                         <span className="text-[10px] text-white/30 uppercase font-bold">Updated</span>
                     </div>
                 </div>

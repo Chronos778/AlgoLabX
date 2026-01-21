@@ -1,13 +1,13 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ArrayVisualizer from './ArrayVisualizer';
-import ArrayBlockVisualizer from './ArrayBlockVisualizer';
+import SortingVisualizer3D from './SortingVisualizer3D';
 import LinearSearchVisualizer from './LinearSearchVisualizer';
 import BinarySearchVisualizer from './BinarySearchVisualizer';
 import TwoPointerVisualizer from './TwoPointerVisualizer';
 import SearchVisualizer from './SearchVisualizer';
 import GraphVisualizer from './GraphVisualizer';
-import DPVisualizer from '../pages/DPVisualizer';
+import DPVisualizer from './DPVisualizer';
 import GanttChartVisualizer from './GanttChartVisualizer';
 import ChartsVisualizer from './ChartsVisualizer';
 import MergeTree from './MergeTree';
@@ -38,49 +38,22 @@ const SmartVisualizer = ({
           return <RadixSortVisualizer currentStep={stepData} />;
         }
 
-        // Use Block Visualizer for sorting algorithms with sorted tracking
+        // Use Premium 3D Visualizer for sorting algorithms
         if (props.useBlockVisualizer || stepData?.sorted) {
           return (
-            <div className="w-full flex flex-col items-center gap-4">
-              {/* Message Banner - Like HeapSort */}
-              {stepData?.message && (
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={stepData.message}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="text-[#9d4edd] text-xs sm:text-sm uppercase tracking-[0.15em] font-bold bg-[#9d4edd]/10 px-4 py-2 rounded-lg border border-[#9d4edd]/30 text-center max-w-full"
-                  >
-                    {stepData.message}
-                  </motion.div>
-                </AnimatePresence>
-              )}
-
-              <ArrayBlockVisualizer
-                array={props.array || stepData?.array || []}
-                activeIndices={props.activeIndices || stepData?.active || []}
-                swappedIndices={props.swappedIndices || []}
-                sortedIndices={stepData?.sorted || []}
-                specialIndices={{
-                  min: stepData?.minIdx,
-                  key: stepData?.keyIdx,
-                  check: stepData?.checkIdx
-                }}
-              />
-
-              {/* Array Indices - Like HeapSort */}
-              <div className="flex justify-center gap-1 sm:gap-2 px-2 flex-nowrap overflow-x-hidden">
-                {(props.array || stepData?.array || []).map((_, idx) => (
-                  <div
-                    key={idx}
-                    className="text-white/50 text-[10px] sm:text-xs font-mono min-w-[2rem] sm:min-w-[3rem] text-center"
-                  >
-                    {idx}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <SortingVisualizer3D
+              array={props.array || stepData?.array || []}
+              activeIndices={props.activeIndices || stepData?.active || []}
+              swappedIndices={props.swappedIndices || stepData?.swapped ? stepData?.active : []} // carefully handle swapped logic
+              sortedIndices={stepData?.sorted || []}
+              specialIndices={{
+                min: stepData?.minIdx,
+                key: stepData?.keyIdx,
+                check: stepData?.checkIdx,
+                pivot: stepData?.pivotIndex // Add pivot if available for quicksort
+              }}
+              message={stepData?.message || stepData?.description}
+            />
           );
         }
 
@@ -173,21 +146,6 @@ const SmartVisualizer = ({
       case 'dp':
         return (
           <div className="w-full flex flex-col items-center gap-4">
-            {/* Message Banner */}
-            {stepData?.message && (
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={stepData.message}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="text-[#8b5cf6] text-xs sm:text-sm uppercase tracking-[0.15em] font-bold bg-[#8b5cf6]/10 px-4 py-2 rounded-lg border border-[#8b5cf6]/30 text-center max-w-full"
-                >
-                  {stepData.message}
-                </motion.div>
-              </AnimatePresence>
-            )}
-
             <DPVisualizer
               currentStep={stepData}
             />
