@@ -4,6 +4,12 @@ A comprehensive web application for visualizing and learning algorithms through 
 
 ## 🚀 Features
 
+### ✨ New: Premium Visual Experience
+- **Recursive Tree Visualization**: Visualize divide-and-conquer algorithms (Merge Sort, Quick Sort) as dynamic, self-balancing trees.
+- **3D Sorting Experience**: Cinematic 3D bar visualizer with glassmorphism, glowing effects, and smooth animations.
+- **Neon Dark Theme**: High-contrast, futuristic "cyberpunk-lite" aesthetic for maximum visual clarity.
+- **Mobile Responsive**: Fully optimized visualizations that adapt intelligently to mobile, tablet, and desktop screens.
+
 ### 📊 Algorithm Categories
 - **Sorting Algorithms**: Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort, Heap Sort, Shell Sort, Counting Sort, Radix Sort, Bucket Sort, Cocktail Sort, Comb Sort, Gnome Sort, Odd-Even Sort
 - **Search Algorithms**: Binary Search, Linear Search, Jump Search, Interpolation Search, Exponential Search, Ternary Search, Fibonacci Search, Sentinel Search, Two-Pointer Search
@@ -11,11 +17,12 @@ A comprehensive web application for visualizing and learning algorithms through 
 - **Dynamic Programming**: 0/1 Knapsack, Longest Common Subsequence, Edit Distance, Coin Change, Matrix Chain Multiplication, Rod Cutting, Longest Increasing Subsequence, Fibonacci DP
 
 ### 🎨 Specialized Visualizers
-- **ArrayVisualizer**: Bar chart visualizations for sorting and searching algorithms
-- **GraphVisualizer**: Node-edge graph visualizations with grid layout
-- **DPVisualizer**: Table-based visualizations for dynamic programming
-- **SearchVisualizer**: Pointer-based visualizations for search algorithms
-- **SmartVisualizer**: Intelligent routing to appropriate visualizer based on algorithm type
+- **RecursiveTreeVisualizer**: **(New)** 3D tree structure for visualizing recursive decomposition steps.
+- **SortingVisualizer3D**: **(New)** High-fidelity 3D bars for generic sorting algorithms.
+- **GraphVisualizer**: Grid-based graph renderer with neon path highlighting.
+- **DPVisualizer**: Interactive table for DP algorithms.
+- **SearchVisualizer**: Dedicated view for linear and binary search operations.
+- **SmartVisualizer**: Intelligent routing engine that selects the best visualization mode.
 
 ### ⚡ Interactive Features
 - **Step-by-step Animation**: Watch algorithms execute step by step
@@ -24,12 +31,6 @@ A comprehensive web application for visualizing and learning algorithms through 
 - **Random Generation**: Generate random test data
 - **Traversal Order Display**: See the exact order of operations
 - **Shortest Path Highlighting**: Visual representation of optimal paths (Dijkstra)
-
-### 🎯 Learning Tools
-- **Algorithm Descriptions**: Detailed explanations for each algorithm
-- **Complexity Analysis**: Time and space complexity information
-- **Interactive Controls**: Play, pause, step forward, step backward, reset
-- **Real-time Messages**: Understand what's happening at each step
 
 ## 🛠️ Technology Stack
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import SmartVisualizer from '../components/SmartVisualizer';
 import QuickSort2D from '../components/QuickSort2D';
-import MergeTree from '../components/MergeTree';
+import RecursiveTreeVisualizer from '../components/RecursiveTreeVisualizer';
 import QuickSort3D from '../components/QuickSort3D';
 import HeapSortVisualizer from '../components/HeapSortVisualizer';
 import BucketSortVisualizer from '../components/BucketSortVisualizer';
@@ -134,7 +134,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
     oddeven: { name: 'Odd-Even Sort', complexity: 'O(n²)', type: 'sorting', getSteps: getOddEvenSortSteps, description: 'Parallel sorting algorithm that compares odd-even indexed pairs, then even-odd pairs alternately.' },
     // Efficient Sorts
     merge: { name: 'Merge Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getMergeSortTreeSteps, description: 'Efficient divide-and-conquer sorting algorithm that divides array into halves, sorts them, and merges them back together.' },
-    quick: { name: 'Quick Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getQuickSort3DSteps, description: 'High-quality 3D visualized divide-and-conquer sorting algorithm. Picks a pivot element and partitions array around it.' },
+    quick: { name: 'Quick Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getQuickSortTreeSteps, description: 'Visualized using Recursive Tree. Picks a pivot element and partitions array around it recursively.' },
     heap: { name: 'Heap Sort', complexity: 'O(n log n)', type: 'sorting', getSteps: getHeapSortDetailedSteps, description: 'Efficient sorting algorithm that uses a binary heap data structure to sort elements in place.' },
     // Non-Comparison Sorts
     counting: { name: 'Counting Sort', complexity: 'O(n + k)', type: 'sorting', getSteps: getCountingSortSteps, description: 'Non-comparison sorting algorithm that sorts elements by counting occurrences of each distinct element.' },
@@ -184,7 +184,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
   const handleCustomInput = () => {
     try {
       const arr = customInput.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num));
-      
+
       // Validation
       if (arr.length === 0) {
         setInputError('Please enter at least one valid number');
@@ -198,7 +198,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
         setInputError('Numbers must be between 0 and 999');
         return;
       }
-      
+
       setInputError('');
       setInputArray(arr);
     } catch (error) {
@@ -273,7 +273,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
 
   useEffect(() => {
     controls.reset();
-  }, [selectedAlgorithm, inputArray, speedMultiplier]);
+  }, [selectedAlgorithm, inputArray]);
 
   return (
     <div className="flex-1 p-3 sm:p-6 md:p-8 overflow-y-auto">
@@ -434,7 +434,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
         </motion.div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 pb-20 sm:pb-8">
           {/* Visualization Panel */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -442,35 +442,39 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
             transition={{ delay: 0.2 }}
             className="lg:col-span-2"
           >
-            <div className="bg-dark-800/40 backdrop-blur-xl border border-white rounded-xl sm:rounded-2xl overflow-hidden">
+            <div className="bg-dark-800/40 backdrop-blur-xl border border-white/10 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl">
               {/* Panel Header */}
-              <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white bg-gradient-to-r from-dark-800/60 to-dark-900/60">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-base sm:text-lg font-semibold text-dark-100 truncate">{currentAlgo.name}</h2>
-                    <p className="text-white text-xs sm:text-sm mt-1 line-clamp-2">{currentAlgo.description}</p>
-                  </div>
-                  <span className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-dark-700/50 text-white text-xs sm:text-sm font-medium border border-dark-600/30 whitespace-nowrap flex-shrink-0">
-                    {currentAlgo.complexity}
-                  </span>
+              <div className="px-4 py-3 border-b border-white/10 bg-gradient-to-r from-dark-800/60 to-dark-900/60 flex items-center justify-between">
+                <div className="min-w-0 flex-1 mr-4">
+                  <h2 className="text-sm sm:text-lg font-bold text-white truncate flex items-center gap-2">
+                    {currentAlgo.name}
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 sm:hidden">
+                      {currentAlgo.complexity}
+                    </span>
+                  </h2>
+                  <p className="text-slate-400 text-xs mt-0.5 line-clamp-1 sm:line-clamp-2">{currentAlgo.description}</p>
                 </div>
+                <span className="hidden sm:inline-flex px-3 py-1 rounded-lg bg-dark-700/50 text-emerald-400 text-xs font-mono border border-emerald-500/20 whitespace-nowrap shadow-inner">
+                  {currentAlgo.complexity}
+                </span>
               </div>
 
               {/* Visualization Area */}
-              <div className="p-3 sm:p-6 overflow-x-auto">
+              <div className="p-2 sm:p-6 overflow-hidden relative min-h-[300px] flex items-center justify-center bg-black/20">
                 {selectedAlgorithm === 'merge' ? (
                   currentStepData ? (
-                    <MergeTree
+                    <RecursiveTreeVisualizer
                       currentStep={currentStepData}
+                      algorithmType="merge"
                     />
                   ) : (
                     <LoadingPlaceholder />
                   )
                 ) : selectedAlgorithm === 'quick' ? (
                   currentStepData ? (
-                    <QuickSort3D
+                    <RecursiveTreeVisualizer
                       currentStep={currentStepData}
-                      isDone={currentStepData.phase === 'done'}
+                      algorithmType="quick"
                     />
                   ) : (
                     <LoadingPlaceholder />
@@ -501,18 +505,12 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
                   )
                 ) : currentAlgo.type === 'graph' ? (
                   currentStepData ? (
-                    <div className="w-full bg-[#050505] rounded-[2.5rem] border border-white overflow-hidden shadow-2xl p-6 sm:p-8 relative flex flex-col items-center justify-center min-h-[350px]">
-                      <GraphVisualizer currentStep={currentStepData} />
-                      {currentStepData && (currentStepData.description || currentStepData.message) && (
-                        <motion.div
-                          key={currentStep}
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-6 p-4 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 w-full max-w-2xl"
-                        >
-                          <p className="text-white text-xs sm:text-sm text-center italic opacity-80">{currentStepData.description || currentStepData.message}</p>
-                        </motion.div>
-                      )}
+                    <div className="w-full min-h-[500px]">
+                      <SmartVisualizer
+                        algorithmType="graph"
+                        algorithmName={selectedAlgorithm}
+                        stepData={currentStepData}
+                      />
                     </div>
                   ) : (
                     <LoadingPlaceholder />
@@ -521,16 +519,6 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
                   currentStepData ? (
                     <div className="w-full bg-[#050505] rounded-[2.5rem] border border-white overflow-hidden shadow-2xl p-6 sm:p-8 relative flex flex-col items-center justify-center min-h-[350px]">
                       <DPVisualizer currentStep={currentStepData} />
-                      {currentStepData && (currentStepData.description || currentStepData.message) && (
-                        <motion.div
-                          key={currentStep}
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-6 p-4 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 w-full max-w-2xl"
-                        >
-                          <p className="text-white text-xs sm:text-sm text-center italic opacity-80">{currentStepData.description || currentStepData.message}</p>
-                        </motion.div>
-                      )}
                     </div>
                   ) : (
                     <LoadingPlaceholder />
@@ -546,7 +534,7 @@ const Learn = ({ selectedAlgorithm, setSelectedAlgorithm }) => {
                         activeIndices={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? currentStepData.active : undefined}
                         swappedIndices={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? (currentStepData.swapped ? currentStepData.active : []) : undefined}
                         maxValue={currentAlgo.type === 'sorting' || currentAlgo.type === 'searching' ? (Math.max(...inputArray) + 10) : undefined}
-                        useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven', 'shell', 'counting', 'merge', 'quick', 'heap'].includes(selectedAlgorithm)}
+                        useBlockVisualizer={['bubble', 'selection', 'insertion', 'cocktail', 'gnome', 'comb', 'oddeven', 'shell', 'counting', 'heap'].includes(selectedAlgorithm)}
                       />
                     ) : (
                       <LoadingPlaceholder />

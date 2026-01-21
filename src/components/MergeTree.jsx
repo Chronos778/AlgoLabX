@@ -8,21 +8,21 @@ const NodeRenderer = memo(({ node, nodes }) => {
   const isLeaf = childrenIds.length === 0;
 
   // Determine visuals based on status
-  let containerClass = "bg-dark-800 border-dark-600/50 text-slate-300";
+  let containerClass = "bg-white/5 border-white/10 text-slate-300 shadow-none";
   let opacity = 1.0;
   let scale = 1.0;
 
   switch (node.status) {
     case 'active-split':
-      containerClass = "bg-indigo-950/50 border-indigo-500 text-indigo-200 font-bold";
+      containerClass = "bg-[#ff00ff]/20 border-[#ff00ff] text-[#ff00ff] font-bold shadow-[0_0_15px_rgba(255,0,255,0.3)]";
       scale = 1.05;
       break;
     case 'active-merge':
-      containerClass = "bg-amber-950/50 border-amber-500 text-amber-200 font-bold";
+      containerClass = "bg-[#ffff00]/20 border-[#ffff00] text-[#ffff00] font-bold shadow-[0_0_15px_rgba(255,255,0,0.3)]";
       scale = 1.05;
       break;
     case 'sorted':
-      containerClass = "bg-emerald-950/50 border-emerald-500 text-emerald-200 font-medium";
+      containerClass = "bg-[#00ffff]/20 border-[#00ffff] text-[#00ffff] font-medium shadow-[0_0_15px_rgba(0,255,255,0.3)]";
       break;
     default:
       break;
@@ -113,12 +113,15 @@ const MergeTree = ({ currentStep }) => {
   if (!currentStep) return null;
 
   return (
-    <div className="w-full bg-dark-900/40 rounded-2xl border border-white overflow-hidden transition-all duration-500">
+    <div className="w-full bg-[#050505] rounded-[2.5rem] border border-white overflow-hidden shadow-2xl p-8 relative flex flex-col items-center justify-center min-h-[400px]">
+      {/* Cinematic Overlay */}
+      <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
+
       <motion.div
         animate={{
           minHeight: isDone ? '250px' : '400px'
         }}
-        className="w-full overflow-auto flex flex-col items-center justify-center p-4 md:p-8"
+        className="w-full overflow-auto flex flex-col items-center justify-center p-4 relative z-10"
       >
         <motion.div
           layout
